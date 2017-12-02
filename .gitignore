@@ -1,7 +1,6 @@
 __pycache__
-data/
+index/
 corpus/
-cacm/
 .DS_Store
 .idea
 .vscode
