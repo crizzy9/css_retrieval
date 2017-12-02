@@ -1,5 +1,8 @@
 import os
 import pickle
+import configparser
+
+CONFIG_FILE = 'config.ini'
 
 
 # using pickle to load dict from file
@@ -21,3 +24,10 @@ def file_to_dict(file_name):
 def dict_to_file(graph, file_name):
     with open(file_name, "wb") as handle:
         pickle.dump(graph, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def load_config():
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILE)
+    return config
+
