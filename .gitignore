@@ -1,0 +1,7 @@
+__pycache__
+data/
+corpus/
+cacm/
+.DS_Store
+.idea
+.vscode
