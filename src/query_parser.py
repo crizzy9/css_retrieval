@@ -6,8 +6,7 @@ class QueryParser:
 
     def __init__(self):
         config = load_config()
-        self.data_dir = config.get('DIRS', 'data_dir')
-        self.query_file = abspath(self.data_dir, config.get('FILES', 'query_file'))
+        self.query_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'query_file'))
         self.data_parser = DataParser()
 
     def get_queries(self):
@@ -22,5 +21,6 @@ class QueryParser:
         return queries
 
 
-qp = QueryParser()
-print(qp.get_queries())
+# Implementation
+# qp = QueryParser()
+# qp.get_queries()
