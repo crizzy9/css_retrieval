@@ -1,6 +1,7 @@
 import os
 import pickle
 import configparser
+import re
 
 CONFIG_FILE = 'config.ini'
 
@@ -55,3 +56,12 @@ def abspath(path, *paths):
     for p in paths:
         fpath = os.path.join(fpath, p)
     return fpath
+
+
+def parse_stuff(data):
+    # https://regex101.com/r/mTSaQw/3
+    punc_regex = re.compile(
+        r'([!"#&\'()*+/;<=>?@\\^_`{|}~])|([.:,$])(?![0-9])|(?<![0-9])([%:])|(\[[0-9a-zA-Z/]*])|([^\x00-\x7F\u2013]+)')
+    whitespace_regex = re.compile(r'[ \n\t]+')
+
+    return re.sub(whitespace_regex, ' ', re.sub(punc_regex, ' ', data)).strip().lower()
