@@ -1,19 +1,20 @@
 import os
-import src.helpers
+from src.helpers import load_config, abspath, dict_to_file, read_file
 from operator import itemgetter
 
 
 class Indexer:
 
     def __init__(self):
-        self.config = src.helpers.load_config()
+        self.config = load_config()
 
     def create(self):
         index = {}
-        index_dir = self.config.get('DEFAULT', 'index_dir')
-        index_file = self.config.get('DEFAULT', 'index_file')
+        index_dir = abspath(self.config.get('DIRS', 'index_dir'))
+        index_file = self.config.get('FILES', 'index_file')
         index_file_path = os.path.join(index_dir, index_file)
-        parsed_dir = self.config.get('DEFAULT', 'parsed_dir')
+        corpus_dir = self.config.get('DIRS', 'corpus_dir')
+        parsed_dir = abspath(corpus_dir, self.config.get('DIRS', 'parsed_dir'))
         files = os.listdir(parsed_dir)
 
         for file_name in files:
@@ -21,9 +22,8 @@ class Indexer:
             
             if file_name.endswith('.txt'):
                 print('Indexing ' + file_name + '...', end='')
-                doc = self.doc_from_file(file_name)
                 doc_name = file_name.split('CACM-')[1].split('.txt')[0]
-                doc_text = doc['text']
+                doc_text = read_file(file_name).strip().split()
                 terms = set(doc_text)
                 
                 for term in terms:
@@ -41,19 +41,10 @@ class Indexer:
                     inv_list.append(entry)
                     index[term] = inv_list
                 print('Done')
-        
-        index = sorted(index, key=lambda k: len(index[k]), reverse=True)
-        src.helpers.dict_to_file(index, index_file_path)
+
+        dict_to_file(index, index_file_path)
         print('Index saved to ' + index_file_path)
         return index
-
-    @staticmethod
-    def doc_from_file(file_name):
-        doc = {}
-        with open(file_name, 'r') as doc_file:
-            doc['text'] = doc_file.readline().strip().split()
-
-        return doc
 
 
 print(Indexer().create())
