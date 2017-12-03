@@ -1,7 +1,7 @@
 import re
 import os
-from helpers import load_config, write_file, create_dir
-from data_parser import DataParser
+from src.helpers import load_config, write_file, create_dir
+from src.data_parser import DataParser
 
 
 class Parser:
@@ -13,8 +13,8 @@ class Parser:
 
     def __init__(self):
         config = load_config()
-        self.cacm_dir = config['DEFAULT']['cacm_dir']
-        self.parsed_dir = config['DEFAULT']['parsed_dir']
+        self.cacm_dir = config.get('DEFAULT','cacm_dir')
+        self.parsed_dir = config.get('DEFAULT','parsed_dir')
         self.data_parser = DataParser()
         create_dir(self.parsed_dir)
         self.parsed_content = ""
@@ -31,5 +31,5 @@ class Parser:
             write_file(os.path.join(os.getcwd(), self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
 
 
-parser = Parser()
-parser.parse_documents()
+# parser = Parser()
+# parser.parse_documents()
