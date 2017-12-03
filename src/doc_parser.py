@@ -6,6 +6,7 @@ from src.data_parser import DataParser
 
 class Parser:
 
+    # https://regex101.com/r/mTSaQw/3
     punc_regex = re.compile(
         r'([!"#&\'()*+/;<=>?@\\^_`{|}~])|([.:,$])(?![0-9])|(?<![0-9])([%:])|(\[[0-9a-zA-Z/]*])|([^\x00-\x7F\u2013]+)')
     whitespace_regex = re.compile(r'[ \n\t]+')
@@ -25,7 +26,8 @@ class Parser:
                 content = f.read()
                 self.data_parser.initialize()
                 self.data_parser.feed(content)
-                self.parsed_content = re.sub(self.whitespace_regex, ' ', re.sub(self.punc_regex, ' ', self.data_parser.get_data()[3])).strip()
+                self.parsed_content = re.sub(self.punc_regex, ' ', self.data_parser.get_data()[3])
+                self.parsed_content = re.sub(self.whitespace_regex, ' ', self.parsed_content).strip().lower()
             write_file(os.path.join(os.getcwd(), self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
 
 
