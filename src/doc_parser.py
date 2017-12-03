@@ -13,16 +13,17 @@ class Parser:
 
     def __init__(self):
         config = load_config()
-        self.cacm_dir = config.get('DEFAULT','cacm_dir')
-        self.parsed_dir = config.get('DEFAULT','parsed_dir')
+        self.corpus_dir = config.get('DEFAULT', 'corpus_dir')
+        self.raw_docs = os.path.join(os.pardir, self.corpus_dir, config.get('DEFAULT', 'raw_docs'))
+        self.parsed_dir = os.path.join(os.pardir, self.corpus_dir, config.get('DEFAULT', 'parsed_docs'))
         self.data_parser = DataParser()
         create_dir(self.parsed_dir)
         self.parsed_content = ""
-        self.corpus = os.listdir(self.cacm_dir)
+        self.raw_corpus = os.listdir(self.raw_docs)
 
     def parse_documents(self):
-        for doc in self.corpus:
-            with open(os.path.join(self.cacm_dir, doc), 'r') as f:
+        for doc in self.raw_corpus:
+            with open(os.path.join(self.raw_docs, doc), 'r') as f:
                 content = f.read()
                 self.data_parser.initialize()
                 self.data_parser.feed(content)
