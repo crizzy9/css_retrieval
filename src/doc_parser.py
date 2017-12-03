@@ -1,6 +1,6 @@
 import re
 import os
-from src.helpers import load_config, write_file, create_dir
+from src.helpers import load_config, write_file, create_dir, abspath
 from src.data_parser import DataParser
 
 
@@ -13,9 +13,9 @@ class Parser:
 
     def __init__(self):
         config = load_config()
-        self.corpus_dir = config.get('DEFAULT', 'corpus_dir')
-        self.raw_docs = os.path.abspath(os.path.join(os.getcwd(), os.pardir, self.corpus_dir, config.get('DEFAULT', 'raw_docs')))
-        self.parsed_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir, self.corpus_dir, config.get('DEFAULT', 'parsed_docs')))
+        self.corpus_dir = config.get('DIRS', 'corpus_dir')
+        self.raw_docs = abspath(self.corpus_dir, config.get('DIRS', 'raw_docs'))
+        self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
         self.data_parser = DataParser()
         create_dir(self.parsed_dir)
         self.parsed_content = ""

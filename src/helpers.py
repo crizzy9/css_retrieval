@@ -48,3 +48,10 @@ def read_file(file_name):
     with open(file_name, "r") as f:
         text = f.read()
     return text
+
+
+def abspath(path, *paths):
+    fpath = os.path.join(os.getcwd(), os.pardir, path)
+    for p in paths:
+        fpath = os.path.join(fpath, p)
+    return fpath
