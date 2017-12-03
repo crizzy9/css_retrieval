@@ -25,5 +25,6 @@ class Parser:
             write_file(os.path.join(self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
 
 
-parser = Parser()
-parser.parse_documents()
+# Implementation
+# parser = Parser()
+# parser.parse_documents()
