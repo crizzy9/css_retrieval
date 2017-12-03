@@ -42,3 +42,9 @@ def write_file(path, data):
     f = open(path, 'w')
     f.write(data)
     f.close()
+
+
+def read_file(file_name):
+    with open(file_name, "r") as f:
+        text = f.read()
+    return text
