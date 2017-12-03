@@ -1,5 +1,5 @@
 import os
-from src.helpers import load_config, abspath, dict_to_file, read_file
+from src.helpers import load_config, abspath, dict_to_file, read_file, create_dir
 from operator import itemgetter
 
 
@@ -20,7 +20,7 @@ class Indexer:
             
             if file_name.endswith('.txt'):
                 print('Indexing ' + file_name + '...', end='')
-                doc_name = file_name.split('CACM-')[1].split('.txt')[0]
+                doc_name = file_name.replace('CACM-', '').replace('.txt', '')
                 doc_text = read_file(file_name).strip().split()
                 terms = set(doc_text)
                 
@@ -45,6 +45,7 @@ class Indexer:
 
     def save_index(self):
         index_dir = abspath(self.config.get('DIRS', 'index_dir'))
+        create_dir(index_dir)
         index_file = self.config.get('FILES', 'index_file')
         index_file_path = os.path.join(index_dir, index_file)
         dict_to_file(self.index, index_file_path)
