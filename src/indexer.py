@@ -10,6 +10,9 @@ class Indexer:
 
     def create(self):
         index = {}
+        index_dir = self.config.get('DEFAULT', 'index_dir')
+        index_file = self.config.get('DEFAULT', 'index_file')
+        index_file_path = os.path.join(index_dir, index_file)
         parsed_dir = self.config.get('DEFAULT', 'parsed_dir')
         files = os.listdir(parsed_dir)
 
@@ -17,6 +20,7 @@ class Indexer:
             file_name = os.path.join(parsed_dir, file_name)
             
             if file_name.endswith('.txt'):
+                print('Indexing ' + file_name + '...', end='')
                 doc = self.doc_from_file(file_name)
                 doc_name = file_name.split('CACM-')[1].split('.txt')[0]
                 doc_text = doc['text']
@@ -36,6 +40,10 @@ class Indexer:
 
                     inv_list.append(entry)
                     index[term] = inv_list
+                print('Done')
+        
+        helpers.dict_to_file(index, index_file_path)
+        print('Index saved to ' + index_file_path)
                 
         return index
 
@@ -47,4 +55,4 @@ class Indexer:
 
         return doc
 
-# print(Indexer().create())
+Indexer().create()
