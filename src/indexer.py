@@ -11,18 +11,18 @@ class Indexer:
         self.corpus_dir = config.get('DIRS', 'corpus_dir')
         self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
         self.index_dir = abspath(config.get('DIRS', 'index_dir'))
-        self.index_file = self.config.get('FILES', 'index_file')
+        self.index_file = config.get('FILES', 'index_file')
 
     def create(self):
         index = {}
-        files = os.listdir(self.parsed_dir)
+        docs = os.listdir(self.parsed_dir)
 
-        for file_name in files:
-            file_name = os.path.join(self.parsed_dir, file_name)
+        for doc in docs:
+            file_name = os.path.join(self.parsed_dir, doc)
             
             if file_name.endswith('.txt'):
-                print('Indexing ' + file_name + '...', end='')
-                doc_name = file_name.replace('CACM-', '').replace('.txt', '')
+                # print('Indexing ' + file_name + '...', end='')
+                doc_name = doc.replace('CACM-', '').replace('.txt', '')
                 doc_text = read_file(file_name).strip().split()
                 terms = set(doc_text)
                 
@@ -40,7 +40,6 @@ class Indexer:
 
                     inv_list.append(entry)
                     index[term] = inv_list
-                print('Done')
 
         self.index = index
 
@@ -55,8 +54,8 @@ class Indexer:
 
 
 # Implementation
-# indexer = Indexer()
-# indexer.create()
-# indexer.save_index()
-# print(indexer.get_index())
+indexer = Indexer()
+indexer.create()
+indexer.save_index()
+print(indexer.get_index())
 
