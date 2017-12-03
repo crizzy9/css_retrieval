@@ -31,3 +31,14 @@ def load_config():
     config.read(CONFIG_FILE)
     return config
 
+
+def create_dir(directory):
+    if not os.path.exists(directory):
+        print("Creating directory:", directory)
+        os.makedirs(directory)
+
+
+def write_file(path, data):
+    f = open(path, 'w')
+    f.write(data)
+    f.close()
