@@ -14,8 +14,8 @@ class Parser:
     def __init__(self):
         config = load_config()
         self.corpus_dir = config.get('DEFAULT', 'corpus_dir')
-        self.raw_docs = os.path.join(os.pardir, self.corpus_dir, config.get('DEFAULT', 'raw_docs'))
-        self.parsed_dir = os.path.join(os.pardir, self.corpus_dir, config.get('DEFAULT', 'parsed_docs'))
+        self.raw_docs = os.path.abspath(os.path.join(os.getcwd(), os.pardir, self.corpus_dir, config.get('DEFAULT', 'raw_docs')))
+        self.parsed_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir, self.corpus_dir, config.get('DEFAULT', 'parsed_docs')))
         self.data_parser = DataParser()
         create_dir(self.parsed_dir)
         self.parsed_content = ""
@@ -29,8 +29,8 @@ class Parser:
                 self.data_parser.feed(content)
                 self.parsed_content = re.sub(self.punc_regex, ' ', self.data_parser.get_data()[3])
                 self.parsed_content = re.sub(self.whitespace_regex, ' ', self.parsed_content).strip().lower()
-            write_file(os.path.join(os.getcwd(), self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
+            write_file(os.path.join(self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
 
 
-# parser = Parser()
-# parser.parse_documents()
+parser = Parser()
+parser.parse_documents()
