@@ -7,12 +7,10 @@ class Indexer:
 
     def __init__(self):
         self.config = load_config()
+        self.index = None
 
     def create(self):
         index = {}
-        index_dir = abspath(self.config.get('DIRS', 'index_dir'))
-        index_file = self.config.get('FILES', 'index_file')
-        index_file_path = os.path.join(index_dir, index_file)
         corpus_dir = self.config.get('DIRS', 'corpus_dir')
         parsed_dir = abspath(corpus_dir, self.config.get('DIRS', 'parsed_dir'))
         files = os.listdir(parsed_dir)
@@ -42,9 +40,22 @@ class Indexer:
                     index[term] = inv_list
                 print('Done')
 
-        dict_to_file(index, index_file_path)
-        print('Index saved to ' + index_file_path)
+        self.index = index
         return index
 
+    def save_index(self):
+        index_dir = abspath(self.config.get('DIRS', 'index_dir'))
+        index_file = self.config.get('FILES', 'index_file')
+        index_file_path = os.path.join(index_dir, index_file)
+        dict_to_file(self.index, index_file_path)
+        print('Index saved to ' + index_file_path)
 
-print(Indexer().create())
+    def get_index(self):
+        return self.index
+
+
+# indexer = Indexer()
+# indexer.create()
+# indexer.save_index()
+# print(indexer.get_index())
+
