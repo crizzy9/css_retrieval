@@ -1,25 +1,26 @@
 import os
 import math
-from src.helpers import load_config, abspath, file_to_dict, read_file
+from src.helpers import load_config, abspath, file_to_dict, read_file, results_to_file, create_dir
+from src.query_parser import QueryParser
 
 
 class Ranker:
 
     def __init__(self):
-        self.config = load_config()
+        config = load_config()
+        self.corpus_dir = config.get('DIRS', 'corpus_dir')
+        self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
+        self.index_dir = abspath(config.get('DIRS', 'index_dir'))
+        self.index_file = config.get('FILES', 'index_file')
     
-    def rank(self, query):
+    def scores(self, query):
         scores = {}
-        corpus_dir = self.config.get('DIRS', 'corpus_dir')
-        parsed_dir = abspath(corpus_dir, self.config.get('DIRS', 'parsed_dir'))
-        index_dir = abspath(self.config.get('DIRS', 'index_dir'))
-        index_file = self.config.get('FILES', 'index_file')
-        docs = os.listdir(corpus_dir)
+        docs = os.listdir(self.parsed_dir)
         corpus_len = len(docs)
-        index = file_to_dict(os.path.join(index_dir, index_file))
+        index = file_to_dict(os.path.join(self.index_dir, self.index_file))
+        print('Ranking documents for query: ' + query + '...', end='')
 
-        for term in query:
-            print('Ranking documents for query term: ' + term + '...', end='')
+        for term in query.split():
 
             if term in index.keys():
                 inv_list = index[term]
@@ -27,14 +28,30 @@ class Ranker:
 
                 for entry in inv_list:
                     doc_id = entry[0]
-                    doc_text = read_file(os.path.join(parsed_dir, doc_id + '.txt'))
+                    doc_name = 'CACM-' + doc_id + '.txt'
+                    doc_text = read_file(os.path.join(self.parsed_dir, doc_name))
                     doc_len = len(doc_text)
                     tf = entry[1] / doc_len
 
                     score = tf * math.log(1 / df)
                     scores[doc_id] = scores[doc_id] + score if doc_id in scores else score
-            print('Done')
-
-        scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+        print('Done')
 
         return scores
+
+
+# Implementation
+# ranker = Ranker()
+# queries = QueryParser().get_queries()
+# config = load_config()
+# results_dir = abspath(config.get('DIRS', 'results'))
+# create_dir(results_dir)
+# results_file_path = os.path.join(results_dir, 'results_tfidf.txt')
+#
+# for query_id in queries:
+#     q = queries[query_id]
+#     s = ranker.scores(q)
+#     results_to_file(results_file_path, s, 'tfidf')
+
+
+

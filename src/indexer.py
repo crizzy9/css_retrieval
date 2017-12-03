@@ -6,17 +6,19 @@ from operator import itemgetter
 class Indexer:
 
     def __init__(self):
-        self.config = load_config()
-        self.index = None
+        config = load_config()
+        self.index = dict()
+        self.corpus_dir = config.get('DIRS', 'corpus_dir')
+        self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
+        self.index_dir = abspath(config.get('DIRS', 'index_dir'))
+        self.index_file = self.config.get('FILES', 'index_file')
 
     def create(self):
         index = {}
-        corpus_dir = self.config.get('DIRS', 'corpus_dir')
-        parsed_dir = abspath(corpus_dir, self.config.get('DIRS', 'parsed_dir'))
-        files = os.listdir(parsed_dir)
+        files = os.listdir(self.parsed_dir)
 
         for file_name in files:
-            file_name = os.path.join(parsed_dir, file_name)
+            file_name = os.path.join(self.parsed_dir, file_name)
             
             if file_name.endswith('.txt'):
                 print('Indexing ' + file_name + '...', end='')
@@ -41,13 +43,10 @@ class Indexer:
                 print('Done')
 
         self.index = index
-        return index
 
     def save_index(self):
-        index_dir = abspath(self.config.get('DIRS', 'index_dir'))
-        create_dir(index_dir)
-        index_file = self.config.get('FILES', 'index_file')
-        index_file_path = os.path.join(index_dir, index_file)
+        create_dir(self.index_dir)
+        index_file_path = os.path.join(self.index_dir, self.index_file)
         dict_to_file(self.index, index_file_path)
         print('Index saved to ' + index_file_path)
 
@@ -55,6 +54,7 @@ class Indexer:
         return self.index
 
 
+# Implementation
 # indexer = Indexer()
 # indexer.create()
 # indexer.save_index()

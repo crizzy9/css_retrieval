@@ -65,3 +65,20 @@ def parse_stuff(data):
     whitespace_regex = re.compile(r'[ \n\t]+')
 
     return re.sub(whitespace_regex, ' ', re.sub(punc_regex, ' ', data)).strip().lower()
+
+
+def results_to_file(file_name, query_id, scores, model):
+    with open(file_name, "w+") as f:
+        rank = 0
+        for score in sorted(scores.items(), key=lambda x: x[1], reverse=True):
+            rank += 1
+            doc_id = score[0]
+            score = score[1]
+            print(query_id, file=f, end=' ')
+            print("Q0", file=f, end=' ')
+            print(doc_id, file=f, end=' ')
+            print(rank, file=f, end=' ')
+            print(score, file=f, end=' ')
+            print(model, file=f)
+        print('', file=f)
+
