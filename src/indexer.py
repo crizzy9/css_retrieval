@@ -1,12 +1,12 @@
 import os
-import helpers
+import src.helpers
 from operator import itemgetter
+
 
 class Indexer:
 
     def __init__(self):
-        self.config = helpers.load_config()
-
+        self.config = src.helpers.load_config()
 
     def create(self):
         index = {}
@@ -28,7 +28,7 @@ class Indexer:
                 
                 for term in terms:
                     inv_list = []
-                    entry = []
+                    entry = list()
                     entry.append(doc_name)
                     entry.append(doc_text.count(term))
                     positions = [i for i, x in enumerate(doc_text) if x == term]
@@ -42,17 +42,18 @@ class Indexer:
                     index[term] = inv_list
                 print('Done')
         
-        helpers.dict_to_file(index, index_file_path)
+        index = sorted(index, key=lambda k: len(index[k]), reverse=True)
+        src.helpers.dict_to_file(index, index_file_path)
         print('Index saved to ' + index_file_path)
-                
         return index
 
-
-    def doc_from_file(self, file_name):
+    @staticmethod
+    def doc_from_file(file_name):
         doc = {}
         with open(file_name, 'r') as doc_file:
             doc['text'] = doc_file.readline().strip().split()
 
         return doc
 
-Indexer().create()
+
+print(Indexer().create())

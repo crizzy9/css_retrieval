@@ -1,7 +1,7 @@
 import re
 import os
-from src.helpers import load_config, write_file, create_dir
-from src.data_parser import DataParser
+from helpers import load_config, write_file, create_dir
+from data_parser import DataParser
 
 
 class Parser:
