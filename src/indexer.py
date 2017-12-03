@@ -11,7 +11,8 @@ class Indexer:
     def create(self):
         index = {}
         index_dir = self.config.get('DEFAULT', 'index_dir')
-        index_file_path = os.path.join(index_dir, 'index.pickle')
+        index_file = self.config.get('DEFAULT', 'index_file')
+        index_file_path = os.path.join(index_dir, index_file)
         parsed_dir = self.config.get('DEFAULT', 'parsed_dir')
         files = os.listdir(parsed_dir)
 
