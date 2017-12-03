@@ -1,7 +1,7 @@
 import re
 import os
-from helpers import load_config, write_file, create_dir
-from data_parser import DataParser
+from src.helpers import load_config, write_file, create_dir
+from src.data_parser import DataParser
 
 
 class Parser:
@@ -13,22 +13,23 @@ class Parser:
 
     def __init__(self):
         config = load_config()
-        self.cacm_dir = config['DEFAULT']['cacm_dir']
-        self.parsed_dir = config['DEFAULT']['parsed_dir']
+        self.corpus_dir = config.get('DEFAULT', 'corpus_dir')
+        self.raw_docs = os.path.abspath(os.path.join(os.getcwd(), os.pardir, self.corpus_dir, config.get('DEFAULT', 'raw_docs')))
+        self.parsed_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir, self.corpus_dir, config.get('DEFAULT', 'parsed_docs')))
         self.data_parser = DataParser()
         create_dir(self.parsed_dir)
         self.parsed_content = ""
-        self.corpus = os.listdir(self.cacm_dir)
+        self.raw_corpus = os.listdir(self.raw_docs)
 
     def parse_documents(self):
-        for doc in self.corpus:
-            with open(os.path.join(self.cacm_dir, doc), 'r') as f:
+        for doc in self.raw_corpus:
+            with open(os.path.join(self.raw_docs, doc), 'r') as f:
                 content = f.read()
                 self.data_parser.initialize()
                 self.data_parser.feed(content)
                 self.parsed_content = re.sub(self.punc_regex, ' ', self.data_parser.get_data()[3])
                 self.parsed_content = re.sub(self.whitespace_regex, ' ', self.parsed_content).strip().lower()
-            write_file(os.path.join(os.getcwd(), self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
+            write_file(os.path.join(self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
 
 
 parser = Parser()
