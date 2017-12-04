@@ -1,94 +1,115 @@
 import re
 import os
-from bs4 import BeautifulSoup
-import requests
-import helpers
+from math import log
+from src.helpers import load_config, write_file, create_dir, abspath, file_to_dict
+from src.query_parser import QueryParser
+from src.data_parser import DataParser
+from src.indexer import Indexer
+from collections import Counter
 
 
 class BM25:
+    q = []
+    k1 = 1.2
+    k2 = 100
+    b = 0.75
+    r = 0.0
+    dl = {}
+    total = 0
+    ranks = {}
+    avgdl = 0
+    sort = []
 
     def __init__(self):
-        self.config = helpers.load_config()
+        self.query_text = {}
+        config = load_config()
+        self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
+        self.query_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'query_file'))
+        self.config = load_config()
+        self.dataparser = DataParser()
 
-    def create(self):
-        q = []
-        k1 = 1.2
-        k2 = 100
-        b = 0.75
-        R = 0.0
-        r = 0.0
-        dl = {}
-        total = 0
-        index = {}
-        ranks = {}
-        avgdl = 0
-        sort = []
-        query_text = {}
 
     def bm25(self):
 
-        c = open("cacm.query.txt", "r")
-        soup = BeautifulSoup(c, "html.parser")
-        soup.prettify().encode('utf-8')
-        count = 1
-        for each in soup.find_all('docno'):
-            each.extract()
-        for each in soup.find_all('doc'):
-            self.query_text[count] = each.text.strip(' \t\n')
-            count += 1
+        for each in self.index:
+            for x in self.index[each]:
+                x[0] = "CACM-" + str(x[0])
 
-        for file in os.listdir("HW3_task1"):
-            # print(file)
-            with open("HW3_task1" "/" + file, 'r') as f:
+
+        for file in os.listdir("C:\\Users\\mahal\\OneDrive\\Desktop\\PDP\\css_retrieval\\corpus\parsed"):
+            with open("C:\\Users\\mahal\\OneDrive\\Desktop\\PDP\\css_retrieval\\corpus\parsed" + "/" + file, 'r') as f:
                 sentence = f.read()
             words = re.findall(r'\w+', sentence)
-            self.dl[file] = len(words)
+            self.dl[file.strip(".txt")] = len(words)
 
         summ = 0
 
         for each in self.dl:
             summ += self.dl[each]
-        print(summ)
-        global avgdl
+        # print(summ)
 
-        global total
-        total = len(self.dl)
+        self.total = len(self.dl)
 
-        avgdl = float(summ) / float(total)
+        # print(self.total)
+
+        avgdl = float(summ) / float(self.total)
+
+        # for x in self.index:
+        #     print(x, self.index[x])
+
         count = 1
-        print(avgdl)
+        # print(avgdl)
         for one in self.query_text:
-            global ranks
-            ranks = {}
+            self.ranks = {}
             for x in self.index:
                 for y in self.index[x]:
-                    ranks[y[0]] = 0
+                    self.ranks[y[0]] = 0
+            # print(len(self.ranks))
+            # for x in self.ranks:
+            #     print(x, self.ranks[x])
             self.rank(self.query_text[one], count)
             count += 1
 
-    def rank(que, count):
+    def rank(self, que, count):
         qterm = que.split()
-        for a in qterm:
-            print(a)
-            for x in index[a]:
-                ranks[x[0]] += score(len(index[a]), x[1], 1, total, dl[x[0]], avgdl)
-        global sort
-        sort = {}
-        sort = sorted(ranks.items(), key=lambda z: z[1], reverse=True)
-        sorts = sort[:100]
-        c = str(count)
-        with open("Q" + c + ".txt", 'w') as f:
-            cnt = 1
-            for x in sorts:
-                f.write(c + " Q0 " + str(x[0]) + " " + str(cnt) + " " + str(x[1]) + " " + "win" + "\n")
-                cnt += 1
-        f.close()
+        count_dict = dict(Counter(qterm))
 
-    def score(n, f, qf, N, dl, avdl):
-        K = k1 * ((1 - b) + b * (float(dl) / float(avdl)))
-        first = log(((r + 0.5) / (R - r + 0.5)) / ((n - r + 0.5) / (N - n - R + r + 0.5)))
-        second = ((k1 + 1) * f) / (K + f)
-        third = ((k2 + 1) * qf) / (k2 + qf)
+        for a in count_dict.keys():
+            if a not in self.index.keys():
+                continue
+            else:
+                for x in self.index[a]:
+                    self.ranks[x[0]] += self.score(len(self.index[a]), x[1], count_dict[a], self.total, self.dl[x[0]],
+                                                   self.avgdl, self.R_calculate(count))
+        self.sort = {}
+        self.sort = sorted(self.ranks.items(), key=lambda z: z[1], reverse=True)
+        for x in self.sort:
+            print(x)
+        # with open("Q" + c + ".txt", 'w') as f:
+        #     cnt = 1
+        #     for x in sorts:
+        #         f.write(c + " Q0 " + str(x[0]) + " " + str(cnt) + " " + str(x[1]) + " " + "BM25_score" + "\n")
+        #         cnt += 1
+        # f.close()
+
+    def score(self, n, f, qf, N, dl, avdl, R):
+        R = float(R)
+        K = self.k1 * ((1 - self.b) + self.b * (float(dl) / float(avdl)))
+        first = log(((self.r + 0.5) / (R - self.r + 0.5)) / ((n - self.r + 0.5) / (N - n - R + self.r + 0.5)))
+        second = ((self.k1 + 1) * f) / (K + f)
+        third = ((self.k2 + 1) * qf) / (self.k2 + qf)
         return first * second * third
 
+    def R_calculate(self, count):
+        with open("C:\\Users\\mahal\\OneDrive\\Desktop\\PDP\\css_retrieval\\data\\cacm.rel.txt") as file:
+            a = file.read().split('\n')
+        r = 0
+        for s in a:
+            if s is not "":
+                res = s.split(" ")[0]
+                if res == str(count):
+                    r += 1
+        return r
 
+
+BM25().bm25()
