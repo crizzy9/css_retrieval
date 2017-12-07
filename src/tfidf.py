@@ -4,38 +4,39 @@ from src.helpers import load_config, abspath, file_to_dict, read_file, results_t
 from src.query_parser import QueryParser
 
 
-class Ranker:
+class TFIDF:
 
     def __init__(self):
         config = load_config()
-        index_dir = abspath(config.get('DIRS', 'index_dir'))
-        index_file = config.get('FILES', 'index_file')
-        self.corpus_dir = config.get('DIRS', 'corpus_dir')
-        self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
-        self.index = file_to_dict(os.path.join(index_dir, index_file))
+        self.parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
+        self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
+        self.scores = {}
     
-    def scores(self, query):
-        scores = {}
+    def rank(self):
+        qp = QueryParser()
+        queries = qp.get_queries()
         docs = os.listdir(self.parsed_dir)
         corpus_len = len(docs)
-        print('Ranking documents for query: ' + query + '...', end='')
 
-        for term in query.split():
+        for qno, query in queries.items():
+            scores = {}
+            print('Ranking documents for query: ' + query + '...', end='')
+            for term in query.split():
+                if term in self.index.keys():
+                    inv_list = self.index[term]
+                    df = len(inv_list) / corpus_len
 
-            if term in self.index.keys():
-                inv_list = self.index[term]
-                df = len(inv_list) / corpus_len
+                    for entry in inv_list:
+                        doc_id = entry[0]
+                        doc_name = 'CACM-' + doc_id + '.txt'
+                        doc_text = read_file(os.path.join(self.parsed_dir, doc_name))
+                        doc_len = len(doc_text)
+                        tf = entry[1] / doc_len
 
-                for entry in inv_list:
-                    doc_id = entry[0]
-                    doc_name = 'CACM-' + doc_id + '.txt'
-                    doc_text = read_file(os.path.join(self.parsed_dir, doc_name))
-                    doc_len = len(doc_text)
-                    tf = entry[1] / doc_len
-
-                    score = tf * math.log(1 / df)
-                    scores[doc_id] = scores[doc_id] + score if doc_id in scores else score
-        print('Done')
+                        score = tf * math.log(1 / df)
+                        scores[doc_id] = scores[doc_id] + score if doc_id in scores else score
+            self.scores[qno] = scores
+            print('Done')
 
         return scores
 

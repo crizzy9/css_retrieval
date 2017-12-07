@@ -1,6 +1,6 @@
 import os
 from collections import Counter
-from src.tfidf import Ranker
+from src.sqlm import SQLM
 from src.helpers import load_config, abspath, file_to_dict, read_file
 
 
@@ -10,16 +10,12 @@ class PRF:
         config = load_config()
         self.corpus_dir = config.get('DIRS', 'corpus_dir')
         self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
-        self.tfidf = Ranker()
+        self.sqlm = SQLM()
 
     def rel_docs(self, query):
         scores = self.tfidf.scores(query)
         rel_docs = list()
-        doc_count = 0
-        for score in sorted(scores.items(), key=lambda x: x[1], reverse=True):
-            doc_count += 1
-            if doc_count > 10:
-                break
+        for score in sorted(scores.items(), key=lambda x: x[1], reverse=True)[:10]:
             rel_docs.append(score[0])
 
         return rel_docs
