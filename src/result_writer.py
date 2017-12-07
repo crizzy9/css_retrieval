@@ -18,13 +18,13 @@ class ResultWriter:
                 doc_id = score[0]
                 score = score[1]
                 rank += 1
-                print(query_id, file=f, end=' ')
-                print('Q0', file=f, end=' ')
-                print(doc_id, file=f, end=' ')
-                print(rank, file=f, end=' ')
-                print(score, file=f, end=' ')
-                print(self.model, file=f)
-            print('', file=f)
+                f.write(query_id + ' ')
+                f.write('Q0 ')
+                f.write(doc_id + ' ')
+                f.write(rank + ' ')
+                f.write(score + ' ')
+                f.write(self.model)
+            f.write('\n')
 
     def clear_results(self):
         files = [f for f in os.listdir(self.results_dir) if f.endswith('.txt')]
