@@ -21,7 +21,7 @@ class Indexer:
             file_name = os.path.join(self.parsed_dir, doc)
             
             if file_name.endswith('.txt'):
-                # print('Indexing ' + file_name + '...', end='')
+                print('Indexing ' + file_name + '...', end='')
                 doc_name = doc.replace('CACM-', '').replace('.txt', '')
                 doc_text = read_file(file_name).strip().split()
                 terms = set(doc_text)
@@ -40,6 +40,7 @@ class Indexer:
 
                     inv_list.append(entry)
                     index[term] = inv_list
+                print('Done')
 
         self.index = index
 
@@ -54,8 +55,8 @@ class Indexer:
 
 
 # Implementation
-indexer = Indexer()
-indexer.create()
-indexer.save_index()
-print(indexer.get_index())
+# indexer = Indexer()
+# indexer.create()
+# indexer.save_index()
+# print(indexer.get_index())
 

@@ -23,4 +23,4 @@ class QueryParser:
 
 # Implementation
 # qp = QueryParser()
-# qp.get_queries()
+# print(qp.get_queries())

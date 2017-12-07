@@ -68,10 +68,8 @@ def parse_stuff(data):
 
 
 def results_to_file(file_name, query_id, scores, model):
-    with open(file_name, "w+") as f:
-        rank = 0
-        for score in sorted(scores.items(), key=lambda x: x[1], reverse=True):
-            rank += 1
+    with open(file_name, "a") as f:
+        for score in sorted(scores.items(), key=lambda x: x[1], reverse=True)[:10]:
             doc_id = score[0]
             score = score[1]
             print(query_id, file=f, end=' ')

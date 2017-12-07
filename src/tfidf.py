@@ -8,22 +8,22 @@ class Ranker:
 
     def __init__(self):
         config = load_config()
+        index_dir = abspath(config.get('DIRS', 'index_dir'))
+        index_file = config.get('FILES', 'index_file')
         self.corpus_dir = config.get('DIRS', 'corpus_dir')
         self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
-        self.index_dir = abspath(config.get('DIRS', 'index_dir'))
-        self.index_file = config.get('FILES', 'index_file')
+        self.index = file_to_dict(os.path.join(index_dir, index_file))
     
     def scores(self, query):
         scores = {}
         docs = os.listdir(self.parsed_dir)
         corpus_len = len(docs)
-        index = file_to_dict(os.path.join(self.index_dir, self.index_file))
         print('Ranking documents for query: ' + query + '...', end='')
 
         for term in query.split():
 
-            if term in index.keys():
-                inv_list = index[term]
+            if term in self.index.keys():
+                inv_list = self.index[term]
                 df = len(inv_list) / corpus_len
 
                 for entry in inv_list:
