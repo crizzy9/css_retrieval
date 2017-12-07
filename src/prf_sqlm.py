@@ -1,7 +1,8 @@
 import os
 from collections import Counter
 from src.sqlm import SQLM
-from src.helpers import load_config, abspath, file_to_dict, read_file
+from src.query_parser import QueryParser
+from src.helpers import load_config, abspath, read_file
 
 
 class PRF:
@@ -11,13 +12,13 @@ class PRF:
         self.corpus_dir = config.get('DIRS', 'corpus_dir')
         self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
         self.sqlm = SQLM()
+        self.scores = {}
 
     def rel_docs(self, query):
-        scores = self.tfidf.scores(query)
+        scores = self.sqlm.scores(query)
         rel_docs = list()
         for score in sorted(scores.items(), key=lambda x: x[1], reverse=True)[:10]:
             rel_docs.append(score[0])
-
         return rel_docs
 
     def get_freq_terms(self, doc_id):
@@ -32,15 +33,19 @@ class PRF:
             query += " " + term
         return query
 
-    def scores(self, query):
-        rel_docs = self.rel_docs(query)
-        new_query = query
+    def scores(self):
+        qp = QueryParser()
+        queries = qp.get_queries()
 
-        for doc_id in rel_docs:
-            common_terms = self.get_freq_terms(doc_id)
-            new_query = PRF.expand_query(new_query, common_terms)
+        for qno, query in queries.items():
+            rel_docs = self.rel_docs(query)
+            new_query = query
 
-        return self.tfidf.scores(query)
+            for doc_id in rel_docs:
+                common_terms = self.get_freq_terms(doc_id)
+                new_query = PRF.expand_query(new_query, common_terms)
+
+            self.scores[query] = self.sqlm.scores(new_query)
 
 
 
