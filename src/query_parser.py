@@ -16,11 +16,11 @@ class QueryParser:
         qdata = self.data_parser.get_data()
         i = 3
         while i < len(qdata):
-            queries[qdata[i]] = parse_stuff(qdata[i+2])
+            queries[int(qdata[i].strip())] = parse_stuff(qdata[i+2])
             i += 8
         return queries
 
 
 # Implementation
-# qp = QueryParser()
-# print(qp.get_queries())
+qp = QueryParser()
+print(qp.get_queries())

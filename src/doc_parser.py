@@ -22,9 +22,15 @@ class Parser:
                 self.data_parser.initialize()
                 self.data_parser.feed(content)
                 self.parsed_content = parse_stuff(self.data_parser.get_data()[3])
+                # to remove numbers at the end (specific for cacm corpus
+                pmindex = self.parsed_content.rfind('pm')
+                if pmindex == -1:
+                    self.parsed_content = self.parsed_content[:self.parsed_content.rfind('am') + 2]
+                else:
+                    self.parsed_content = self.parsed_content[:pmindex + 2]
             write_file(os.path.join(self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
 
 
 # Implementation
-# parser = Parser()
-# parser.parse_documents()
+parser = Parser()
+parser.parse_documents()
