@@ -13,7 +13,7 @@ class ResultWriter:
         self.clear_results()
 
     def results_to_file(self, query_id, scores):
-        append_write = 'a' if os.path.exists(self.file_path) else 'w'
+        append_write = 'a' if os.path.isfile(self.file_path) else 'w'
         with open(self.file_path, append_write) as f:
             rank = 0
             for score in sorted(scores.items(), key=lambda x: x[1], reverse=True)[:100]:

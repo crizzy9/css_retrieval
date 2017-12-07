@@ -42,14 +42,13 @@ class Ranker:
 
 
 # Implementation
-# ranker = Ranker()
-# queries = QueryParser().get_queries()
-# results_dir = abspath('results')
-# results_path = os.path.join(results_dir, 'results_tfidf.txt')
-# rw = ResultWriter('results_tfidf.txt', 'tfidf')
-#
-# for query_id in queries:
-#     q = queries[query_id]
-#     s = ranker.scores(q)
-#     rw.results_to_file(query_id, s)
-#     break
+ranker = Ranker()
+queries = QueryParser().get_queries()
+results_dir = abspath('results')
+results_path = os.path.join(results_dir, 'results_tfidf.txt')
+rw = ResultWriter('results_tfidf.txt', 'tfidf')
+
+for query_id in queries:
+    q = queries[query_id]
+    s = ranker.scores(q)
+    rw.results_to_file(query_id, s)

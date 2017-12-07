@@ -14,9 +14,7 @@ class SQLM:
         self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
         self.scores = {}
 
-    def rank(self):
-        qp = QueryParser()
-        queries = qp.get_queries()
+    def scores(self, query):
         dlens = {doc.replace('CACM-', '').replace('.txt', ''): len(read_file(os.path.join(self.parsed_dir, doc)).split(' ')) for doc in os.listdir(self.parsed_dir)}
         clen = sum(dlens.values())
         for qno, query in queries.items():
