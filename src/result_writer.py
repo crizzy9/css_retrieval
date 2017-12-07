@@ -20,9 +20,9 @@ class ResultWriter:
                 doc_id = score[0]
                 score = score[1]
                 rank += 1
-                f.write(query_id + ' ')
+                f.write(str(query_id) + ' ')
                 f.write('Q0 ')
-                f.write(doc_id + ' ')
+                f.write(str(doc_id) + ' ')
                 f.write(str(rank) + ' ')
                 f.write(str(score) + ' ')
                 f.write(self.model)
