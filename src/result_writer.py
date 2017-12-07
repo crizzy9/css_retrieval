@@ -27,6 +27,7 @@ class ResultWriter:
                 f.write(str(score) + ' ')
                 f.write(self.model)
                 f.write('\n')
+            f.write('\n')
 
     def clear_results(self):
         files = os.listdir(self.results_dir)
