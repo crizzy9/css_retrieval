@@ -1,6 +1,8 @@
 import os
 import math
-from src.helpers import load_config, abspath, file_to_dict, read_file
+from src.helpers import load_config, abspath, file_to_dict, read_file, create_dir
+from src.query_parser import QueryParser
+from src.result_writer import ResultWriter
 
 
 class Ranker:
@@ -38,15 +40,16 @@ class Ranker:
 
         return scores
 
+
 # Implementation
 # ranker = Ranker()
 # queries = QueryParser().get_queries()
-# config = load_config()
-# results_dir = abspath(config.get('DIRS', 'results'))
-# create_dir(results_dir)
-# results_file_path = os.path.join(results_dir, 'results_tfidf.txt')
+# results_dir = abspath('results')
+# results_path = os.path.join(results_dir, 'results_tfidf.txt')
+# rw = ResultWriter('results_tfidf.txt', 'tfidf')
 #
 # for query_id in queries:
 #     q = queries[query_id]
 #     s = ranker.scores(q)
-#     results_to_file(results_file_path, s, 'tfidf')
+#     rw.results_to_file(query_id, s)
+#     break

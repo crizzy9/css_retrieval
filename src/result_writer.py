@@ -23,13 +23,14 @@ class ResultWriter:
                 f.write(query_id + ' ')
                 f.write('Q0 ')
                 f.write(doc_id + ' ')
-                f.write(rank + ' ')
-                f.write(score + ' ')
+                f.write(str(rank) + ' ')
+                f.write(str(score) + ' ')
                 f.write(self.model)
-            f.write('\n')
+                f.write('\n')
 
     def clear_results(self):
-        files = [f for f in os.listdir(self.results_dir) if f.endswith('.txt')]
+        files = os.listdir(self.results_dir)
         for f in files:
-            os.remove(f)
+            if f.endswith('.txt'):
+                os.remove(abspath(self.results_dir, f))
 
