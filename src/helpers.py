@@ -58,12 +58,15 @@ def abspath(path, *paths):
     return fpath
 
 
-def parse_stuff(data):
+def parse_stuff(data, period=False):
     # https://regex101.com/r/mTSaQw/3
+    if period:
+        puncs = ':,$'
+    else:
+        puncs = '.:,$'
     punc_regex = re.compile(
-        r'([!"#&\'()*+/;<=>?@\\^_`{|}~])|([.:,$])(?![0-9])|(?<![0-9])([%:])|(\[[0-9a-zA-Z/]*])|([^\x00-\x7F\u2013]+)')
+        r'([!"#&\'()*+/;<=>?@\\^_`{|}~])|([' + puncs + '])(?![0-9])|(?<![0-9])([%:])|(\[[0-9a-zA-Z/]*])|([^\x00-\x7F\u2013]+)')
     whitespace_regex = re.compile(r'[ \n\t]+')
-
     return re.sub(whitespace_regex, ' ', re.sub(punc_regex, ' ', data)).strip().lower()
 
 
