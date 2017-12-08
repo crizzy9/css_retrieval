@@ -9,8 +9,11 @@ class PRF:
 
     def __init__(self):
         config = load_config()
-        self.corpus_dir = config.get('DIRS', 'corpus_dir')
-        self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
+        data_dir = config.get('DIRS', 'data_dir')
+        stopwords_file = abspath(data_dir, config.get('FILES', 'common_words'))
+        corpus_dir = config.get('DIRS', 'corpus_dir')
+        self.stopwords = read_file(stopwords_file).split('\n')
+        self.parsed_dir = abspath(corpus_dir, config.get('DIRS', 'parsed_dir'))
         self.sqlm = SQLM()
 
     def rel_docs(self, query):
@@ -21,9 +24,13 @@ class PRF:
         return rel_docs
 
     def get_freq_terms(self, doc_id):
+        freq_terms = []
         doc_path = os.path.join(self.parsed_dir, 'CACM-' + doc_id + '.txt')
         terms = read_file(doc_path).split()
-        freq_terms = Counter(terms).most_common()
+        most_common = Counter(terms).most_common()
+        for term in most_common:
+            if term not in self.stopwords:
+                freq_terms.append(term)
         return freq_terms
 
     def scores(self, query):
@@ -31,8 +38,8 @@ class PRF:
         new_query = query
 
         for doc_id in rel_docs:
-            common_terms = self.get_freq_terms(doc_id)
-            new_query = PRF.expand_query(new_query, common_terms)
+            freq_terms = self.get_freq_terms(doc_id)
+            new_query = PRF.expand_query(new_query, freq_terms)
 
         return self.sqlm.scores(new_query)
 
