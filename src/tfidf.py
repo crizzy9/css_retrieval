@@ -7,23 +7,35 @@ from src.result_writer import ResultWriter
 
 class Ranker:
 
-    def __init__(self):
+    def __init__(self, mode):
+        self.mode = mode
         config = load_config()
         index_dir = abspath(config.get('DIRS', 'index_dir'))
         index_file = config.get('FILES', 'index_file')
         self.corpus_dir = config.get('DIRS', 'corpus_dir')
         self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
         self.index = file_to_dict(os.path.join(index_dir, index_file))
+        self.common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
 
     def scores(self, query):
         scores = {}
         docs = os.listdir(self.parsed_dir)
         corpus_len = len(docs)
-        print('Ranking documents for query: ' + query + '...', end='')
+        # print('Ranking documents for query: ' + query + '...', end='')
+
+        with open(self.common_words) as file:
+            commons = file.readlines()
+
+        for each in commons:
+            each.strip("\n")
 
         for term in query.split():
-
             if term in self.index.keys():
+
+                if self.mode == 2:
+                    if term in commons:
+                        continue
+
                 inv_list = self.index[term]
                 df = len(inv_list) / corpus_len
 
@@ -36,7 +48,7 @@ class Ranker:
 
                     score = tf * math.log(1 / df)
                     scores[doc_id] = scores[doc_id] + score if doc_id in scores else score
-        print('Done')
+    # print('Done')
 
         return scores
 
