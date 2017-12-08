@@ -9,7 +9,8 @@ class SQLM:
 
     LAMBDA = 0.35
 
-    def __init__(self):
+    def __init__(self, mode):
+        self.mode = mode
         config = load_config()
         self.parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
         self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
@@ -19,9 +20,20 @@ class SQLM:
     def scores(self, query):
         scores = {}
 
+        with open(self.common_words) as file:
+            commons = file.readlines()
+
+        for each in commons:
+            each.strip("\n")
+
         for term in query.split():
 
             if term in self.index.keys():
+
+                if self.mode == 2:
+                    if term in commons:
+                        continue
+
                 cqi = sum([p[1] for p in self.index[term]])
 
                 for posting in self.index[term]:
