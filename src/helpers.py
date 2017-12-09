@@ -81,4 +81,3 @@ def results_to_file(file_name, query_id, scores, model):
             print(score, file=f, end=' ')
             print(model, file=f)
         print('', file=f)
-

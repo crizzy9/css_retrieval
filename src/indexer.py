@@ -5,21 +5,31 @@ from operator import itemgetter
 
 class Indexer:
 
-    def __init__(self):
+    def __init__(self, mode):
+        self.mode = mode
         config = load_config()
         self.index = dict()
         self.corpus_dir = config.get('DIRS', 'corpus_dir')
         self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
+        self.stem_dir = abspath(self.corpus_dir, config.get('DIRS', 'stem_dir'))
         self.index_dir = abspath(config.get('DIRS', 'index_dir'))
         self.index_file = config.get('FILES', 'index_file')
+        self.stem_index_file = config.get('FILES', 'stem_index_file')
 
     def create(self):
+        docs = ""
         index = {}
-        docs = os.listdir(self.parsed_dir)
+        if self.mode == 1:
+            docs = os.listdir(self.parsed_dir)
+        elif self.mode == 2:
+            docs = os.listdir(self.stem_dir)
 
         for doc in docs:
-            file_name = os.path.join(self.parsed_dir, doc)
-            
+            if self.mode == 1:
+                file_name = os.path.join(self.parsed_dir, doc)
+            elif self.mode == 2:
+                file_name = os.path.join(self.stem_dir, doc)
+
             if file_name.endswith('.txt'):
                 print('Indexing ' + file_name + '...', end='')
                 doc_name = doc.replace('CACM-', '').replace('.txt', '')
@@ -46,7 +56,11 @@ class Indexer:
 
     def save_index(self):
         create_dir(self.index_dir)
-        index_file_path = os.path.join(self.index_dir, self.index_file)
+        index_file_path = ""
+        if self.mode == 1:
+            index_file_path = os.path.join(self.index_dir, self.index_file)
+        elif self.mode == 2:
+            index_file_path = os.path.join(self.index_dir, self.stem_index_file)
         dict_to_file(self.index, index_file_path)
         print('Index saved to ' + index_file_path)
 
@@ -58,5 +72,8 @@ class Indexer:
 # indexer = Indexer()
 # indexer.create()
 # indexer.save_index()
-# print(indexer.get_index())
+ind = Indexer(2)
+ind.create()
+ind.save_index()
+print(ind.get_index())
 
