@@ -5,58 +5,136 @@ from src.rel_reader import RelevanceReader
 class Evaluator:
 
     def __init__(self, file_name):
-        config = load_config()
         self.rel_data = RelevanceReader().get_rel_data()
         self.run = Evaluator.get_run(file_name)
-        self.precision = self.calc_precision()
-        self.p_at_5 = self.get_p_at_k(5)
-        # self.p_at_20 = self.get_p_at_k(20)
-        self.recall = self.calc_recall()
+        self.precision = self.__calc_precision()
+        self.p_at_5 = self.__get_p_at_k(5)
+        self.p_at_20 = self.__get_p_at_k(20)
+        self.recall = self.__calc_recall()
+        self.ap = self.__calc_ap()
+        self.map = self.__calc_map()
+        self.rr = self.__calc_rr()
+        self.mrr = self.__calc_mrr()
 
-    def calc_precision(self):
+    def __calc_precision(self):
         precision = {}
         for query_id in self.run:
-            precision[query_id] = []
             if query_id in self.rel_data:
+                precision[query_id] = []
                 retrieved = []
                 for doc_id in self.run[query_id]:
                     retrieved.append(doc_id)
-                    p_at_k = self.rel_count(query_id, retrieved) / len(retrieved)
-                    precision[query_id].append(p_at_k)
+                    p_at_k = self.__rel_count(query_id, retrieved) / len(retrieved)
+                    relevant = self.__is_rel(query_id, doc_id)
+                    precision[query_id].append([doc_id, p_at_k, relevant])
         return precision
 
-    def calc_recall(self):
+    def __calc_recall(self):
         recall = {}
         for query_id in self.run:
-            recall[query_id] = []
             if query_id in self.rel_data:
+                recall[query_id] = []
                 retrieved = []
                 for doc_id in self.run[query_id]:
                     retrieved.append(doc_id)
-                    r_at_k = self.rel_count(query_id, retrieved) / len(self.rel_data[query_id])
-                    recall[query_id].append(r_at_k)
+                    r_at_k = self.__rel_count(query_id, retrieved) / len(self.rel_data[query_id])
+                    relevant = self.__is_rel(query_id, doc_id)
+                    recall[query_id].append([doc_id, r_at_k, relevant])
         return recall
 
-    def get_p_at_k(self, k):
+    def __get_p_at_k(self, k):
         p_at_k = {}
         for query_id in self.precision:
-            print(query_id)
-            print(len(self.precision[query_id]))
-            # p_at_k[query_id] = self.precision[query_id][k-1]
+            p_at_k[query_id] = self.precision[query_id][k-1][1]
         return p_at_k
 
-    def calc_ap(self):
-        pass
+    def __calc_ap(self):
+        ap = {}
+        for query_id in self.precision:
+            p_list = self.precision[query_id]
+            sum = 0
+            count = 0
+            idx = 0
+            for p in p_list:
+                doc_id = self.run[query_id][idx]
+                idx += 1
+                if self.__is_rel(query_id, doc_id):
+                    sum += p[1]
+                    count += 1
+            ap_for_query = sum / count if count != 0 else 0
+            ap[query_id] = ap_for_query
+        return ap
 
-    def rel_count(self, query_id, retrieved):
+    def __calc_map(self):
+        return sum(self.ap.values()) / len(self.ap)
+
+    def __calc_rr(self):
+        rr = {}
+        for query_id in self.rel_data:
+            doc = next(filter(lambda doc_id: self.__is_rel(query_id, doc_id), self.run[query_id]), None)
+            reciprocal_rank = 1 / (self.run[query_id].index(doc) + 1) if doc is not None else None
+            rr[query_id] = reciprocal_rank
+        return rr
+
+    def __calc_mrr(self):
+        return sum(self.rr.values()) / len(self.rr)
+
+    def __rel_count(self, query_id, retrieved):
         count = 0
         for doc_id in retrieved:
-            if doc_id in self.rel_data[query_id]:
+            if self.__is_rel(query_id, doc_id):
                 count += 1
         return count
 
-    def is_rel(self, query_id, doc_id):
+    def __is_rel(self, query_id, doc_id):
         return doc_id in self.rel_data[query_id]
+
+    def eval_to_file(self, run_name):
+        config = load_config()
+        eval_dir = abspath(config.get('DIRS', 'results'), config.get('DIRS', 'eval_dir'))
+        precision_file_name = abspath(eval_dir, run_name + '_precision.txt')
+        recall_file_name = abspath(eval_dir, run_name + '_recall.txt')
+        p_at_5_file_name = abspath(eval_dir, run_name + '_p_at_5.txt')
+        p_at_20_file_name = abspath(eval_dir, run_name + '_p_at_20.txt')
+        map_mrr_file_name = abspath(eval_dir, run_name + '_map_mrr.txt')
+        Evaluator.pr_to_file(self.precision, precision_file_name)
+        Evaluator.pr_to_file(self.recall, recall_file_name)
+        Evaluator.p_at_k_to_file(self.p_at_5, p_at_5_file_name)
+        Evaluator.p_at_k_to_file(self.p_at_20, p_at_20_file_name)
+        Evaluator.map_mrr_to_file(self.map, self.mrr, map_mrr_file_name)
+
+    @staticmethod
+    def pr_to_file(metric, file_name):
+        with open(file_name, 'w+') as f:
+            for query_id in metric:
+                values = metric[query_id]
+                rank = 0
+                for value in values:
+                    rank += 1
+                    doc_id = str(value[0])
+                    metric_value = str(value[1])
+                    relevant = 'R' if value[2] else 'N'
+                    f.write(str(query_id) + ' ')
+                    f.write(str(rank) + ' ')
+                    f.write(doc_id + ' ')
+                    f.write(metric_value + ' ')
+                    f.write(relevant)
+                    f.write('\n')
+                f.write('\n')
+
+    @staticmethod
+    def p_at_k_to_file(p_at_k, file_name):
+        with open(file_name, 'w+') as f:
+            for query_id in p_at_k:
+                f.write(str(query_id) + ' ')
+                f.write(str(p_at_k[query_id]) + '\n')
+            f.write('\n')
+
+    @staticmethod
+    def map_mrr_to_file(map, mrr, file_name):
+        with open(file_name, 'w+') as f:
+            f.write(str(map) + ' ')
+            f.write(str(mrr))
 
     @staticmethod
     def get_run(file_name):
@@ -71,4 +149,12 @@ class Evaluator:
         return run
 
 
-e = Evaluator(abspath(load_config().get('DIRS', 'results'), 'results_tfidf.txt'))
+e = Evaluator(abspath(load_config().get('DIRS', 'results'), 'results_sqlm.txt'))
+print(e.run)
+print(e.precision)
+print(e.recall)
+print(e.p_at_5)
+print(e.p_at_20)
+print(e.map)
+print(e.mrr)
+e.eval_to_file('sqlm')
