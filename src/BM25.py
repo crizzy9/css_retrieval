@@ -5,7 +5,6 @@ from src.helpers import load_config, write_file, create_dir, abspath, file_to_di
 from src.query_parser import QueryParser
 from src.data_parser import DataParser
 from src.result_writer import ResultWriter
-from src.indexer import Indexer
 from collections import Counter
 
 
@@ -20,14 +19,17 @@ class BM25:
     avgdl = 0
     sort = []
 
-    def __init__(self):
+    def __init__(self, mode):
+        self.mode = mode
         self.query_text = {}
         config = load_config()
         self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
         self.query_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'query_file'))
         self.rel_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'relevance_data'))
+        self.common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
         self.config = load_config()
         self.dataparser = DataParser()
+        self.rw = ResultWriter("results_bm25.txt", "BM25")
 
     def bm25(self):
         for each in self.index:
@@ -72,20 +74,32 @@ class BM25:
             count += 1
 
     def rank(self, que, count):
+        with open(self.common_words) as file:
+            commons = file.readlines()
+        for wrd in commons:
+            wrd.strip("\n")
+
         qterm = que.split()
         count_dict = dict(Counter(qterm))
 
-        for a in count_dict.keys():
-            if a not in self.index.keys():
-                continue
-            else:
-                for x in self.index[a]:
-                    self.ranks[x[0]] += self.score(len(self.index[a]), x[1], count_dict[a], self.total, self.dl[x[0]],
-                                                   self.avgdl, self.R_calculate(count), self.r_calculate(a, count))
+        for wrd in count_dict.keys():
+            if wrd in self.index.keys():
+                if self.mode == 1:
+                    for x in self.index[wrd]:
+                        self.ranks[x[0]] += self.score(len(self.index[wrd]), x[1], count_dict[wrd], self.total,
+                                                       self.dl[x[0]],
+                                                       self.avgdl, self.R_calculate(count),
+                                                       self.r_calculate(wrd, count))
+                elif self.mode == 2:
+                    if wrd not in commons:
+                        for x in self.index[wrd]:
+                            self.ranks[x[0]] += self.score(len(self.index[wrd]), x[1], count_dict[wrd], self.total,
+                                                           self.dl[x[0]],
+                                                           self.avgdl, self.R_calculate(count),
+                                                           self.r_calculate(wrd, count))
         # self.sort = {}
         # self.sort = sorted(self.ranks.items(), key=lambda z: z[1], reverse=True)
-        rw = ResultWriter("results_bm25.txt", "BM25")
-        rw.results_to_file(count, self.ranks)
+        self.rw.results_to_file(count, self.ranks)
 
         # c = str(count)
         # with open("C:\\Users\\mahal\\OneDrive\\Desktop\\PDP\\css_retrieval\\BM25" "/" + "Q" + c + ".txt", 'w') as f:
@@ -126,4 +140,4 @@ class BM25:
         return res
 
 
-BM25().bm25()
+BM25(1).bm25()

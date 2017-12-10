@@ -7,7 +7,8 @@ from src.result_writer import ResultWriter
 
 class TFIDF:
 
-    def __init__(self):
+    def __init__(self, mode):
+        self.mode = mode
         config = load_config()
         index_dir = abspath(config.get('DIRS', 'index_dir'))
         index_file = config.get('FILES', 'index_file')
@@ -28,20 +29,26 @@ class TFIDF:
             each.strip("\n")
 
         for term in query.split():
-            if term not in commons:
-                if term in self.index.keys():
-                    inv_list = self.index[term]
-                    df = len(inv_list) / corpus_len
 
-                    for entry in inv_list:
-                        doc_id = entry[0]
-                        doc_name = 'CACM-' + doc_id + '.txt'
-                        doc_text = read_file(os.path.join(self.parsed_dir, doc_name))
-                        doc_len = len(doc_text)
-                        tf = entry[1] / doc_len
+            if term in self.index.keys():
 
-                        score = tf * math.log(1 / df)
-                        scores[doc_id] = scores[doc_id] + score if doc_id in scores else score
+                if self.mode == 2:
+                    if term in commons:
+                        continue
+
+                inv_list = self.index[term]
+                df = len(inv_list) / corpus_len
+
+                for entry in inv_list:
+                    doc_id = entry[0]
+                    doc_name = 'CACM-' + doc_id + '.txt'
+                    doc_text = read_file(os.path.join(self.parsed_dir, doc_name))
+                    doc_len = len(doc_text)
+                    tf = entry[1] / doc_len
+
+                    score = tf * math.log(1 / df)
+                    scores[doc_id] = scores[doc_id] + score if doc_id in scores else score
+    # print('Done')
 
         return scores
 

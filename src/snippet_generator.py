@@ -1,6 +1,6 @@
 import os
 from src.data_parser import DataParser
-from src.helpers import load_config, abspath, read_file
+from src.helpers import load_config, abspath, read_file, parse_stuff
 
 
 class SnippetGenerator:
@@ -21,9 +21,17 @@ class SnippetGenerator:
             content = read_file(os.path.join(self.raw_docs, 'CACM-' + doc + '.html'))
             self.dataparser.initialize()
             self.dataparser.feed(content)
-            data = self.dataparser.get_data()[3]
-            # data = data[:data.rfind('CACM')]
-            print(data.split('\n\n'))
+            data = []
+            org_data = self.dataparser.get_data()[3].split('\n\n')[1:-2]
+            # parsing document
+            for line in org_data:
+                data.append(parse_stuff(line, period=True))
+            print(data)
+            sentences = [line.split('.') for line in data]
+            old_sentences = [line.split('.') for line in data]
+
+
+
 
 
 
