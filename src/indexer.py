@@ -72,8 +72,8 @@ class Indexer:
 # indexer = Indexer()
 # indexer.create()
 # indexer.save_index()
-ind = Indexer(2)
-ind.create()
-ind.save_index()
-print(ind.get_index())
+# ind = Indexer(2)
+# ind.create()
+# ind.save_index()
+# print(ind.get_index())
 
