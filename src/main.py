@@ -39,6 +39,13 @@ results_file_sqlm_stop = config.get('FILES', 'results_sqlm_stop')
 results_file_sqlm_prf = config.get('FILES', 'results_sqlm_prf')
 results_file_bm25 = config.get('FILES', 'results_bm25')
 
+results_tfidf = []
+results_tfidf_stop = []
+results_sqlm = []
+results_sqlm_stop = []
+results_sqlm_prf = []
+results_bm25 = []
+
 print()
 
 for query_id in queries:
@@ -49,14 +56,26 @@ for query_id in queries:
     score_sqlm = sqlm.scores(query)
     score_sqlm_stop = sqlm_stop.scores(query)
     score_sqlm_prf = sqlm_prf.scores(query)
-    rw.results_to_file(results_file_tfidf, query_id, score_tfidf, 'tfidf')
-    rw.results_to_file(results_file_tfidf_stop, query_id, score_tfidf_stop, 'tfidf_stop')
-    rw.results_to_file(results_file_sqlm, query_id, score_sqlm, 'sqlm')
-    rw.results_to_file(results_file_sqlm_stop, query_id, score_sqlm_stop, 'sqlm_stop')
-    rw.results_to_file(results_file_sqlm_prf, query_id, score_sqlm_prf, 'sqlm_prf')
+
+    results_tfidf.append(score_tfidf)
+    results_tfidf_stop.append(score_tfidf_stop)
+    results_sqlm.append(score_sqlm)
+    results_sqlm_stop.append(score_sqlm_stop)
+    results_sqlm_prf.append(score_sqlm_prf)
+    # rw.results_to_file(results_file_tfidf, query_id, score_tfidf, 'tfidf')
+    # rw.results_to_file(results_file_tfidf_stop, query_id, score_tfidf_stop, 'tfidf_stop')
+    # rw.results_to_file(results_file_sqlm, query_id, score_sqlm, 'sqlm')
+    # rw.results_to_file(results_file_sqlm_stop, query_id, score_sqlm_stop, 'sqlm_stop')
+    # rw.results_to_file(results_file_sqlm_prf, query_id, score_sqlm_prf, 'sqlm_prf')
     print('Done')
 
 print()
+
+rw.results_to_file(results_file_tfidf, results_tfidf, 'tfidf')
+rw.results_to_file(results_file_tfidf_stop, results_tfidf_stop, 'tfidf_stop')
+rw.results_to_file(results_file_sqlm, results_sqlm, 'sqlm')
+rw.results_to_file(results_file_sqlm_stop, results_sqlm_stop, 'sqlm_stop')
+rw.results_to_file(results_file_sqlm_prf, results_sqlm_prf, 'sqlm_prf')
 
 eval_tfidf = Evaluator(results_file_tfidf)
 eval_tfidf_stop = Evaluator(results_file_tfidf_stop)
