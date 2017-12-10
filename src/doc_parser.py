@@ -14,9 +14,9 @@ class Parser:
         create_dir(self.parsed_dir)
         self.parsed_content = ""
         self.raw_corpus = os.listdir(self.raw_docs)
-        corpus_dir = config.get('DIRS', 'corpus_dir')
-        self.stem_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'stemmed_docs'))
+
         self.stem_dir = abspath(corpus_dir, config.get('DIRS', 'stem_dir'))
+        self.stem_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'stemmed_docs'))
         create_dir(self.stem_dir)
         self.docs = []
 
@@ -35,7 +35,7 @@ class Parser:
                     self.parsed_content = self.parsed_content[:pmindex + 2]
             write_file(os.path.join(self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
 
-    def stem_parse_document(self):
+    def stem_parse_documents(self):
         with open(self.stem_file) as f:
             content = f.read().split('#')
             for each in content:
@@ -49,5 +49,5 @@ class Parser:
 
 
 # Implementation
-parser = Parser()
-parser.parse_documents()
+# parser = Parser()
+# parser.parse_documents()
