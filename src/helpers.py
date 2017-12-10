@@ -68,3 +68,9 @@ def parse_stuff(data, period=False):
         r'([!"#&\'()*+/;<=>?@\\^_`{|}~])|([' + puncs + '])(?![0-9])|(?<![0-9])([%:])|(\[[0-9a-zA-Z/]*])|([^\x00-\x7F\u2013]+)')
     whitespace_regex = re.compile(r'[ \n\t]+')
     return re.sub(whitespace_regex, ' ', re.sub(punc_regex, ' ', data)).strip().lower()
+
+
+def get_stoplist():
+    config = load_config()
+    common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
+    return read_file(common_words).split('\n')
