@@ -1,8 +1,6 @@
 from math import log
 import os
-from src.helpers import load_config, abspath, file_to_dict,read_file
-from src.query_parser import QueryParser
-from src.result_writer import ResultWriter
+from src.helpers import load_config, abspath, file_to_dict, read_file, get_stoplist
 
 
 class SQLM:
@@ -16,23 +14,16 @@ class SQLM:
         self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
         self.dlens = {doc.replace('CACM-', '').replace('.txt', ''): len(read_file(os.path.join(self.parsed_dir, doc)).split()) for doc in os.listdir(self.parsed_dir)}
         self.clen = sum(self.dlens.values())
-        self.common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
+        self.stoplist = get_stoplist()
 
     def scores(self, query):
         scores = {}
 
-        with open(self.common_words) as file:
-            commons = file.readlines()
-
-        for each in commons:
-            each.strip("\n")
-
         for term in query.split():
 
             if term in self.index.keys():
-
                 if self.mode == 2:
-                    if term in commons:
+                    if term in self.stoplist:
                         continue
 
                 cqi = sum([p[1] for p in self.index[term]])
