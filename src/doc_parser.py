@@ -41,13 +41,20 @@ class Parser:
             for each in content:
                 self.data_parser.initialize()
                 self.data_parser.feed(each)
-                self.docs.append(parse_stuff(each))
+                each = parse_stuff(each)
+                pmindex = each.rfind('pm')
+                if pmindex == -1:
+                    each = each[:each.rfind('am') + 2]
+                else:
+                    each = each[:pmindex + 2]
+                self.docs.append(each)
             for doc in self.docs:
                 if doc is not "":
                     write_file(os.path.join(self.stem_dir, 'CACM-' + str(doc).split(" ")[0].zfill(4) + ".txt"),
-                               str(doc[2:]))
+                               " ".join(str(doc).split(" ")[1:]))
 
 
 # Implementation
 # parser = Parser()
-# parser.parse_documents()
+# parser.stem_parse_documents()
+
