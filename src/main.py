@@ -14,13 +14,13 @@ start_time = time.time()
 
 config = load_config()
 
-parser = Parser()
-parser.parse_documents()
-
-indexer = Indexer(mode=1)
-indexer.create()
-indexer.save_index()
-index = indexer.get_index()
+# parser = Parser()
+# parser.parse_documents()
+#
+# indexer = Indexer(mode=1)
+# indexer.create()
+# indexer.save_index()
+# index = indexer.get_index()
 
 queries = QueryParser().get_queries()
 
@@ -29,7 +29,8 @@ tfidf_stop = TFIDF(mode=2)
 sqlm = SQLM(mode=1)
 sqlm_stop = SQLM(mode=2)
 sqlm_prf = PRF(sqlm)
-# bm25 = BM25(mode=1).bm25()
+bm25 = BM25(mode=1)
+bm25_stop = BM25(mode=2)
 
 rw = ResultWriter()
 results_file_tfidf = config.get('FILES', 'results_tfidf')
@@ -38,6 +39,7 @@ results_file_sqlm = config.get('FILES', 'results_sqlm')
 results_file_sqlm_stop = config.get('FILES', 'results_sqlm_stop')
 results_file_sqlm_prf = config.get('FILES', 'results_sqlm_prf')
 results_file_bm25 = config.get('FILES', 'results_bm25')
+results_file_bm25_stop = config.get('FILES', 'results_bm25_stop')
 
 results_tfidf = []
 results_tfidf_stop = []
@@ -45,28 +47,30 @@ results_sqlm = []
 results_sqlm_stop = []
 results_sqlm_prf = []
 results_bm25 = []
+results_bm25_stop = []
 
 print()
 
 for query_id in queries:
     print('Scoring documents for query:' + str(query_id) + '...', end='')
+
     query = queries[query_id]
     score_tfidf = tfidf.scores(query)
     score_tfidf_stop = tfidf_stop.scores(query)
     score_sqlm = sqlm.scores(query)
     score_sqlm_stop = sqlm_stop.scores(query)
     score_sqlm_prf = sqlm_prf.scores(query)
+    score_bm25 = bm25.scores(query_id, query)
+    score_bm25_stop = bm25_stop.scores(query_id, query)
 
     results_tfidf.append(score_tfidf)
     results_tfidf_stop.append(score_tfidf_stop)
     results_sqlm.append(score_sqlm)
     results_sqlm_stop.append(score_sqlm_stop)
     results_sqlm_prf.append(score_sqlm_prf)
-    # rw.results_to_file(results_file_tfidf, query_id, score_tfidf, 'tfidf')
-    # rw.results_to_file(results_file_tfidf_stop, query_id, score_tfidf_stop, 'tfidf_stop')
-    # rw.results_to_file(results_file_sqlm, query_id, score_sqlm, 'sqlm')
-    # rw.results_to_file(results_file_sqlm_stop, query_id, score_sqlm_stop, 'sqlm_stop')
-    # rw.results_to_file(results_file_sqlm_prf, query_id, score_sqlm_prf, 'sqlm_prf')
+    results_bm25.append(score_bm25)
+    results_bm25_stop.append(score_bm25_stop)
+
     print('Done')
 
 print()
@@ -76,13 +80,16 @@ rw.results_to_file(results_file_tfidf_stop, results_tfidf_stop, 'tfidf_stop')
 rw.results_to_file(results_file_sqlm, results_sqlm, 'sqlm')
 rw.results_to_file(results_file_sqlm_stop, results_sqlm_stop, 'sqlm_stop')
 rw.results_to_file(results_file_sqlm_prf, results_sqlm_prf, 'sqlm_prf')
+rw.results_to_file(results_file_bm25, results_bm25, 'bm25')
+rw.results_to_file(results_file_bm25_stop, results_bm25_stop, 'bm25')
 
 eval_tfidf = Evaluator(results_file_tfidf)
 eval_tfidf_stop = Evaluator(results_file_tfidf_stop)
 eval_sqlm = Evaluator(results_file_sqlm)
 eval_sqlm_stop = Evaluator(results_file_sqlm_stop)
 eval_sqlm_prf = Evaluator(results_file_sqlm_prf)
-# eval_bm25 = Evaluator(results_file_bm25)
+eval_bm25 = Evaluator(results_file_bm25)
+eval_bm25_stop = Evaluator(results_file_bm25_stop)
 
 print('Evaluating results for tf.idf...', end='')
 eval_tfidf.evaluate()
@@ -109,9 +116,15 @@ eval_sqlm_prf.evaluate()
 eval_sqlm_prf.eval_to_file('sqlm_prf')
 print('Done')
 
-# print('Evaluating results for BM25...', end='')
-# eval_bm25.eval_to_file('bm25')
-# print('Done')
+print('Evaluating results for BM25...', end='')
+eval_bm25.evaluate()
+eval_bm25.eval_to_file('bm25')
+print('Done')
+
+print('Evaluating results for BM25 with stopping...', end='')
+eval_bm25_stop.evaluate()
+eval_bm25_stop.eval_to_file('bm25_stop')
+print('Done')
 
 end_time = time.time()
 
