@@ -35,7 +35,7 @@ class Parser:
                     self.parsed_content = self.parsed_content[:pmindex + 2]
             write_file(os.path.join(self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
 
-    def stem_parse_document(self):
+    def stem_parse_documents(self):
         with open(self.stem_file) as f:
             content = f.read().split('#')
             for each in content:

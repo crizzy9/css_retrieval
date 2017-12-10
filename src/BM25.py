@@ -2,9 +2,7 @@ import os
 from math import log
 from src.helpers import load_config, abspath, file_to_dict, get_stoplist, read_file
 from src.query_parser import QueryParser
-from src.result_writer import ResultWriter
 from collections import Counter
-import time
 
 
 class BM25:
@@ -14,7 +12,7 @@ class BM25:
 
     def __init__(self, mode):
         self.mode = mode
-        self.query_text = {}
+        # self.query_text = {}
         config = load_config()
         self.parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
         self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
@@ -96,3 +94,4 @@ for qid in queries:
 # --- 512.7903730869293 seconds ---
 # New run time
 # --- 3.44008207321167 seconds ---
+
