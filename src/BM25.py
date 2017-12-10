@@ -1,7 +1,5 @@
-import os
 from math import log
-from src.helpers import load_config, abspath, file_to_dict, get_stoplist, get_relevance_data
-from src.query_parser import QueryParser
+from src.helpers import load_config, abspath, file_to_dict, get_stoplist, get_relevance_data, get_doc_lengths, doc_total
 from collections import Counter
 
 
@@ -12,15 +10,12 @@ class BM25:
 
     def __init__(self, mode):
         self.mode = mode
-        # self.query_text = {}
         config = load_config()
-        self.parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
         self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
         self.rel_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'relevance_data'))
 
         self.stoplist = get_stoplist()
-        self.docs = os.listdir(self.parsed_dir)
-        self.N = len(self.docs)
+        self.N = doc_total()
         self.k = {}
         self.calc_k()
         self.R = get_relevance_data()
@@ -59,29 +54,22 @@ class BM25:
         return scores
 
     def calc_k(self):
-        doc_lens = {}
-        tot_len = 0
-        for doc in self.docs:
-            with open(os.path.join(self.parsed_dir, doc)) as f:
-                doc_lens[doc] = len(f.read().split(' '))
-                tot_len += doc_lens[doc]
+        doc_lens = get_doc_lengths()
+        tot_len = sum(doc_lens.values())
 
-        avg_len = tot_len / len(self.docs)
+        avg_len = tot_len / self.N
 
         for doc, dlen in doc_lens.items():
-            self.k[doc.replace('CACM-', '').replace('.txt', '')] = self.k1 * ((1 - self.b) + self.b * dlen / avg_len)
+            self.k[doc] = self.k1 * ((1 - self.b) + self.b * dlen / avg_len)
 
 
-bm25 = BM25(1)
-results_bm25 = []
-queries = QueryParser().get_queries()
-for qid in queries:
-    score_bm25 = bm25.scores(qid, queries.get(qid))
-    results_bm25.append(score_bm25)
+# bm25 = BM25(1)
+# results_bm25 = []
+# queries = QueryParser().get_queries()
+# for qid in queries:
+#     score_bm25 = bm25.scores(qid, queries.get(qid))
+#     results_bm25.append(score_bm25)
 
-# Execution time:
-# Old run time
-# --- 512.7903730869293 seconds ---
-# New run time
+# Run time
 # --- 3.44008207321167 seconds ---
 

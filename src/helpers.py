@@ -87,3 +87,21 @@ def get_relevance_data():
         doc_id = data[2].replace('CACM-', '')
         relevance.setdefault(query_id, []).append(doc_id)
     return relevance
+
+
+def get_doc_lengths():
+    config = load_config()
+    parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
+    docs = os.listdir(parsed_dir)
+    doc_lens = {}
+    for doc in docs:
+        with open(os.path.join(parsed_dir, doc)) as f:
+            doc_lens[doc.replace('CACM-', '').replace('.txt', '')] = len(f.read().split())
+
+    return doc_lens
+
+
+def doc_total():
+    config = load_config()
+    parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
+    return len(os.listdir(parsed_dir))
