@@ -23,7 +23,7 @@ class BM25:
         self.mode = mode
         self.query_text = {}
         config = load_config()
-        self.parsed_dir = abspath(config.get('DIRS', 'parsed'))
+        self.parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
         self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
         self.query_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'query_file'))
         self.rel_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'relevance_data'))
@@ -38,6 +38,8 @@ class BM25:
 
         qp = QueryParser()
         self.query_text = qp.get_queries()
+
+        # print(self.parsed_dir)
 
         for file in os.listdir(self.parsed_dir):
             with open(self.parsed_dir + "/" + file, 'r') as f:
