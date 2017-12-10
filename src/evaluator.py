@@ -5,9 +5,22 @@ from src.rel_reader import RelevanceReader
 class Evaluator:
 
     def __init__(self, file_name):
+        config = load_config()
+        self.results_file_path = abspath(config.get('DIRS', 'results'), file_name)
+        self.eval_dir_path = abspath(config.get('DIRS', 'results'), config.get('DIRS', 'eval_dir'))
         self.file_name = file_name
         self.rel_data = RelevanceReader().get_rel_data()
-        self.run = Evaluator.get_run(file_name)
+        self.run = self.get_run()
+        self.precision = {}
+        self.p_at_5 = {}
+        self.p_at_20 = {}
+        self.recall = {}
+        self.ap = {}
+        self.map = 0.0
+        self.rr = {}
+        self.mrr = 0.0
+
+    def evaluate(self):
         self.precision = self.__calc_precision()
         self.p_at_5 = self.__get_p_at_k(5)
         self.p_at_20 = self.__get_p_at_k(20)
@@ -97,18 +110,27 @@ class Evaluator:
         return doc_id in self.rel_data[query_id]
 
     def eval_to_file(self, run_name):
-        config = load_config()
-        eval_dir = abspath(config.get('DIRS', 'results'), config.get('DIRS', 'eval_dir'))
-        precision_file_name = abspath(eval_dir, run_name + '_precision.txt')
-        recall_file_name = abspath(eval_dir, run_name + '_recall.txt')
-        p_at_5_file_name = abspath(eval_dir, run_name + '_p_at_5.txt')
-        p_at_20_file_name = abspath(eval_dir, run_name + '_p_at_20.txt')
-        map_mrr_file_name = abspath(eval_dir, run_name + '_map_mrr.txt')
+        precision_file_name = abspath(self.eval_dir_path, run_name + '_precision.txt')
+        recall_file_name = abspath(self.eval_dir_path, run_name + '_recall.txt')
+        p_at_5_file_name = abspath(self.eval_dir_path, run_name + '_p_at_5.txt')
+        p_at_20_file_name = abspath(self.eval_dir_path, run_name + '_p_at_20.txt')
+        map_mrr_file_name = abspath(self.eval_dir_path, run_name + '_map_mrr.txt')
         Evaluator.pr_to_file(self.precision, precision_file_name)
         Evaluator.pr_to_file(self.recall, recall_file_name)
         Evaluator.p_at_k_to_file(self.p_at_5, p_at_5_file_name)
         Evaluator.p_at_k_to_file(self.p_at_20, p_at_20_file_name)
         Evaluator.map_mrr_to_file(self.map, self.mrr, map_mrr_file_name)
+
+    def get_run(self):
+        run = {}
+        run_text = read_file(self.results_file_path)
+        run_text = run_text.replace('\n\n', '\n')
+        for line in run_text.split('\n')[:-1]:
+            data = line.split()
+            query_id = data[0]
+            doc_id = data[2]
+            run.setdefault(query_id, []).append(doc_id)
+        return run
 
     @staticmethod
     def pr_to_file(metric, file_name):
@@ -142,19 +164,6 @@ class Evaluator:
         with open(file_name, 'w+') as f:
             f.write(str(map) + ' ')
             f.write(str(mrr))
-
-    @staticmethod
-    def get_run(file_name):
-        run = {}
-        file_path = abspath(load_config().get('DIRS', 'results'), file_name)
-        run_text = read_file(file_path)
-        run_text = run_text.replace('\n\n', '\n')
-        for line in run_text.split('\n')[:-1]:
-            data = line.split()
-            query_id = data[0]
-            doc_id = data[2]
-            run.setdefault(query_id, []).append(doc_id)
-        return run
 
 
 # e = Evaluator(abspath(load_config().get('DIRS', 'results'), 'results_tfidf.txt'))
