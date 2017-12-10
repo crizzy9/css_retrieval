@@ -1,6 +1,6 @@
 import os
 import math
-from src.helpers import load_config, abspath, file_to_dict, read_file, create_dir
+from src.helpers import load_config, abspath, file_to_dict, read_file, create_dir, get_stoplist
 from src.query_parser import QueryParser
 from src.result_writer import ResultWriter
 
@@ -15,25 +15,19 @@ class TFIDF:
         self.corpus_dir = config.get('DIRS', 'corpus_dir')
         self.parsed_dir = abspath(self.corpus_dir, config.get('DIRS', 'parsed_dir'))
         self.index = file_to_dict(os.path.join(index_dir, index_file))
-        self.common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
+        self.stoplist = get_stoplist()
 
     def scores(self, query):
         scores = {}
         docs = os.listdir(self.parsed_dir)
         corpus_len = len(docs)
 
-        with open(self.common_words) as file:
-            commons = file.readlines()
-
-        for each in commons:
-            each.strip("\n")
-
         for term in query.split():
 
             if term in self.index.keys():
 
                 if self.mode == 2:
-                    if term in commons:
+                    if term in self.stoplist:
                         continue
 
                 inv_list = self.index[term]
