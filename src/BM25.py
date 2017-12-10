@@ -142,4 +142,4 @@ class BM25:
         return res
 
 
-BM25(1).bm25()
+# BM25(1).bm25()
