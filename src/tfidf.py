@@ -5,7 +5,7 @@ from src.query_parser import QueryParser
 from src.result_writer import ResultWriter
 
 
-class Ranker:
+class TFIDF:
 
     def __init__(self):
         config = load_config()
@@ -20,7 +20,6 @@ class Ranker:
         scores = {}
         docs = os.listdir(self.parsed_dir)
         corpus_len = len(docs)
-        # print('Ranking documents for query: ' + query + '...', end='')
 
         with open(self.common_words) as file:
             commons = file.readlines()
@@ -43,19 +42,18 @@ class Ranker:
 
                         score = tf * math.log(1 / df)
                         scores[doc_id] = scores[doc_id] + score if doc_id in scores else score
-        # print('Done')
 
         return scores
 
 
 # Implementation
-ranker = Ranker()
-queries = QueryParser().get_queries()
-results_dir = abspath('results')
-results_path = os.path.join(results_dir, 'results_tfidf.txt')
-rw = ResultWriter('results_tfidf.txt', 'tfidf')
-
-for query_id in queries:
-    q = queries[query_id]
-    s = ranker.scores(q)
-    rw.results_to_file(query_id, s)
+# ranker = TFIDF()
+# queries = QueryParser().get_queries()
+# results_dir = abspath('results')
+# results_path = os.path.join(results_dir, 'results_tfidf.txt')
+# rw = ResultWriter()
+#
+# for query_id in queries:
+#     q = queries[query_id]
+#     s = ranker.scores(q)
+#     rw.results_to_file('results_tfidf.txt', query_id, s, 'tfidf')

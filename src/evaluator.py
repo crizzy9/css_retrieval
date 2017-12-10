@@ -139,7 +139,8 @@ class Evaluator:
     @staticmethod
     def get_run(file_name):
         run = {}
-        run_text = read_file(file_name)
+        file_path = abspath(load_config().get('DIRS', 'results'), file_name)
+        run_text = read_file(file_path)
         run_text = run_text.replace('\n\n', '\n')
         for line in run_text.split('\n')[:-1]:
             data = line.split()
@@ -149,12 +150,12 @@ class Evaluator:
         return run
 
 
-e = Evaluator(abspath(load_config().get('DIRS', 'results'), 'results_sqlm.txt'))
-print(e.run)
-print(e.precision)
-print(e.recall)
-print(e.p_at_5)
-print(e.p_at_20)
-print(e.map)
-print(e.mrr)
-e.eval_to_file('sqlm')
+# e = Evaluator(abspath(load_config().get('DIRS', 'results'), 'results_tfidf.txt'))
+# print(e.run)
+# print(e.precision)
+# print(e.recall)
+# print(e.p_at_5)
+# print(e.p_at_20)
+# print(e.map)
+# print(e.mrr)
+# e.eval_to_file('tfidf')

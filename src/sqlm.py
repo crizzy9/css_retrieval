@@ -35,14 +35,14 @@ class SQLM:
 
 
 # Implementation
-sqlm = SQLM()
-queries = QueryParser().get_queries()
-results_dir = abspath('results')
-results_path = os.path.join(results_dir, 'results_sqlm.txt')
-rw = ResultWriter('results_sqlm.txt', 'sqlm')
-
-for query_id in queries:
-    q = queries[query_id]
-    s = sqlm.scores(q)
-    rw.results_to_file(query_id, s)
+# sqlm = SQLM()
+# queries = QueryParser().get_queries()
+# results_dir = abspath('results')
+# results_path = os.path.join(results_dir, 'results_sqlm.txt')
+# rw = ResultWriter()
+#
+# for query_id in queries:
+#     q = queries[query_id]
+#     s = sqlm.scores(q)
+#     rw.results_to_file('results_sqlm.txt', query_id, s, 'sqlm')
 
