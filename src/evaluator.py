@@ -5,6 +5,7 @@ from src.rel_reader import RelevanceReader
 class Evaluator:
 
     def __init__(self, file_name):
+        self.file_name = file_name
         self.rel_data = RelevanceReader().get_rel_data()
         self.run = Evaluator.get_run(file_name)
         self.precision = self.__calc_precision()
@@ -61,6 +62,9 @@ class Evaluator:
                 if self.__is_rel(query_id, doc_id):
                     sum += p[1]
                     count += 1
+            if sum == 0:
+                print(self.file_name + ' AP ' + str(query_id) + ': NO RELEVANT DOCS')
+                print()
             ap_for_query = sum / count if count != 0 else 0
             ap[query_id] = ap_for_query
         return ap
@@ -72,7 +76,10 @@ class Evaluator:
         rr = {}
         for query_id in self.rel_data:
             doc = next(filter(lambda doc_id: self.__is_rel(query_id, doc_id), self.run[query_id]), None)
-            reciprocal_rank = 1 / (self.run[query_id].index(doc) + 1) if doc is not None else None
+            if doc is None:
+                print(self.file_name + ' RR ' + str(query_id) + ': NO RELEVANT DOCS')
+                print()
+            reciprocal_rank = 1 / (self.run[query_id].index(doc) + 1) if doc is not None else 0
             rr[query_id] = reciprocal_rank
         return rr
 
