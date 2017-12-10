@@ -1,5 +1,4 @@
-from src.helpers import load_config, abspath, read_file
-from src.rel_reader import RelevanceReader
+from src.helpers import load_config, abspath, read_file, get_relevance_data
 
 
 class Evaluator:
@@ -9,7 +8,7 @@ class Evaluator:
         self.results_file_path = abspath(config.get('DIRS', 'results'), file_name)
         self.eval_dir_path = abspath(config.get('DIRS', 'results'), config.get('DIRS', 'eval_dir'))
         self.file_name = file_name
-        self.rel_data = RelevanceReader().get_rel_data()
+        self.rel_data = get_relevance_data()
         self.run = self.get_run()
         self.precision = {}
         self.p_at_5 = {}

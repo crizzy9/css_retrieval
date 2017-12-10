@@ -1,6 +1,6 @@
 import os
 from math import log
-from src.helpers import load_config, abspath, file_to_dict, get_stoplist, read_file
+from src.helpers import load_config, abspath, file_to_dict, get_stoplist, get_relevance_data
 from src.query_parser import QueryParser
 from collections import Counter
 
@@ -23,8 +23,7 @@ class BM25:
         self.N = len(self.docs)
         self.k = {}
         self.calc_k()
-        self.R = {}
-        self.calc_R()
+        self.R = get_relevance_data()
 
     def scores(self, qid, query):
         if self.R.get(qid):
@@ -71,15 +70,6 @@ class BM25:
 
         for doc, dlen in doc_lens.items():
             self.k[doc.replace('CACM-', '').replace('.txt', '')] = self.k1 * ((1 - self.b) + self.b * dlen / avg_len)
-
-    def calc_R(self):
-        rel_data = read_file(self.rel_file).strip().split('\n')
-        for entry in rel_data:
-            if entry is not '':
-                data = entry.split()
-                qid = int(data[0])
-                doc = data[2]
-                self.R.setdefault(qid, []).append(doc.replace('CACM-', ''))
 
 
 bm25 = BM25(1)

@@ -74,3 +74,16 @@ def get_stoplist():
     config = load_config()
     common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
     return read_file(common_words).split('\n')
+
+
+def get_relevance_data():
+    config = load_config()
+    rel_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'relevance_data'))
+    rel_data = read_file(rel_file).strip().split('\n')
+    relevance = {}
+    for line in rel_data:
+        data = line.split()
+        query_id = data[0]
+        doc_id = data[2].replace('CACM-', '')
+        relevance.setdefault(query_id, []).append(doc_id)
+    return relevance
