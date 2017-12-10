@@ -1,6 +1,6 @@
 import os
 from src.data_parser import DataParser
-from src.helpers import load_config, abspath, read_file, parse_stuff
+from src.helpers import load_config, abspath, read_file, parse_stuff, get_stoplist
 from collections import Counter
 import pprint
 
@@ -11,13 +11,9 @@ class SnippetGenerator:
         config = load_config()
         self.raw_docs = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'raw_docs'))
         self.parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
-        common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
-        self.stoplist = []
-        with open(common_words, 'r') as f:
-            self.stoplist = f.read().split('\n')
+        self.stoplist = get_stoplist()
         self.significant_words = set([term for term in query.split() if term not in self.stoplist])
-        print("Significant words")
-        print(self.significant_words)
+        print("Significant words: {}".format(self.significant_words))
         self.dataparser = DataParser()
 
     # using luhns formula to get medium frequency words from the document

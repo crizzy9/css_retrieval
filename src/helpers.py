@@ -70,17 +70,7 @@ def parse_stuff(data, period=False):
     return re.sub(whitespace_regex, ' ', re.sub(punc_regex, ' ', data)).strip().lower()
 
 
-def results_to_file(file_name, query_id, scores, model):
-    with open(file_name, "a") as f:
-        rank = 0
-        for score in sorted(scores.items(), key=lambda x: x[1], reverse=True)[:100]:
-            doc_id = score[0]
-            rank += 1
-            score = score[1]
-            print(query_id, file=f, end=' ')
-            print("Q0", file=f, end=' ')
-            print(doc_id, file=f, end=' ')
-            print(rank, file=f, end=' ')
-            print(score, file=f, end=' ')
-            print(model, file=f)
-        print('', file=f)
+def get_stoplist():
+    config = load_config()
+    common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
+    return read_file(common_words).split('\n')

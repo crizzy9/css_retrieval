@@ -21,7 +21,7 @@ class BM25:
 
     def __init__(self, mode):
         self.mode = mode
-        self.query_text = {}
+        # self.query_text = {}
         config = load_config()
         self.parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
         self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
@@ -29,17 +29,11 @@ class BM25:
         self.rel_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'relevance_data'))
         self.common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
         self.dataparser = DataParser()
-        self.rw = ResultWriter()
+        # self.rw = ResultWriter()
 
-    def bm25(self):
         for each in self.index:
             for x in self.index[each]:
                 x[0] = "CACM-" + str(x[0])
-
-        qp = QueryParser()
-        self.query_text = qp.get_queries()
-
-        # print(self.parsed_dir)
 
         for file in os.listdir(self.parsed_dir):
             with open(self.parsed_dir + "/" + file, 'r') as f:
@@ -47,17 +41,34 @@ class BM25:
             words = re.findall(r'\w+', sentence)
             self.dl[file.strip(".txt")] = len(words)
 
+        self.total = len(self.dl)
+
         summ = 0
 
         for each in self.dl:
             summ += self.dl[each]
+
+        self.avgdl = float(summ) / float(self.total)
+
+
+    def bm25(self):
+
+
+        qp = QueryParser()
+        self.query_text = qp.get_queries()
+
+        # print(self.parsed_dir)
+
+
+
+
         # print(summ)
 
-        self.total = len(self.dl)
+
 
         # print(self.total)
 
-        self.avgdl = float(summ) / float(self.total)
+
 
         # for x in self.index:
         #     print(x, self.index[x])
@@ -101,7 +112,7 @@ class BM25:
                                                            self.r_calculate(wrd, count))
         # self.sort = {}
         # self.sort = sorted(self.ranks.items(), key=lambda z: z[1], reverse=True)
-        self.rw.results_to_file("results_bm25.txt", count, self.ranks, "BM25")
+        # self.rw.results_to_file("results_bm25.txt", count, self.ranks, "BM25")
 
         # c = str(count)
         # with open("C:\\Users\\mahal\\OneDrive\\Desktop\\PDP\\css_retrieval\\BM25" "/" + "Q" + c + ".txt", 'w') as f:
@@ -142,4 +153,4 @@ class BM25:
         return res
 
 
-BM25(1).bm25()
+# BM25(1).bm25()
