@@ -23,13 +23,13 @@ class BM25:
         self.mode = mode
         self.query_text = {}
         config = load_config()
+        self.parsed_dir = abspath(config.get('DIRS', 'parsed'))
         self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
         self.query_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'query_file'))
         self.rel_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'relevance_data'))
         self.common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
-        self.config = load_config()
         self.dataparser = DataParser()
-        self.rw = ResultWriter("results_bm25.txt", "BM25")
+        self.rw = ResultWriter()
 
     def bm25(self):
         for each in self.index:
@@ -39,8 +39,8 @@ class BM25:
         qp = QueryParser()
         self.query_text = qp.get_queries()
 
-        for file in os.listdir("C:\\Users\\mahal\\OneDrive\\Desktop\\PDP\\css_retrieval\\corpus\parsed"):
-            with open("C:\\Users\\mahal\\OneDrive\\Desktop\\PDP\\css_retrieval\\corpus\parsed" + "/" + file, 'r') as f:
+        for file in os.listdir(self.parsed_dir):
+            with open(self.parsed_dir + "/" + file, 'r') as f:
                 sentence = f.read()
             words = re.findall(r'\w+', sentence)
             self.dl[file.strip(".txt")] = len(words)
@@ -99,7 +99,7 @@ class BM25:
                                                            self.r_calculate(wrd, count))
         # self.sort = {}
         # self.sort = sorted(self.ranks.items(), key=lambda z: z[1], reverse=True)
-        self.rw.results_to_file(count, self.ranks)
+        self.rw.results_to_file("results_bm25.txt", count, self.ranks, "BM25")
 
         # c = str(count)
         # with open("C:\\Users\\mahal\\OneDrive\\Desktop\\PDP\\css_retrieval\\BM25" "/" + "Q" + c + ".txt", 'w') as f:
