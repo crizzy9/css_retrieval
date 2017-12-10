@@ -7,6 +7,7 @@ class QueryParser:
     def __init__(self):
         config = load_config()
         self.query_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'query_file'))
+        self.stem_query_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'stem_query_file'))
         self.data_parser = DataParser()
 
     def get_queries(self):
@@ -20,7 +21,20 @@ class QueryParser:
             i += 8
         return queries
 
+    def get_stem_queries(self):
+        squeries = {}
+        with open(self.stem_query_file) as f:
+            content = f.readlines()
+            content = [x.strip(' \t\n') for x in content]
+            count = 1
+            for each in content:
+                if each is not "":
+                    squeries[count] = each
+                    count += 1
+        return squeries
+
 
 # Implementation
-qp = QueryParser()
-print(qp.get_queries())
+# qp = QueryParser()
+# # qp.get_stem_queries()
+# print(qp.get_stem_queries())

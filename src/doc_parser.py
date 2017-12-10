@@ -14,6 +14,11 @@ class Parser:
         create_dir(self.parsed_dir)
         self.parsed_content = ""
         self.raw_corpus = os.listdir(self.raw_docs)
+        corpus_dir = config.get('DIRS', 'corpus_dir')
+        self.stem_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'stemmed_docs'))
+        self.stem_dir = abspath(corpus_dir, config.get('DIRS', 'stem_dir'))
+        create_dir(self.stem_dir)
+        self.docs = []
 
     def parse_documents(self):
         for doc in self.raw_corpus:
@@ -29,6 +34,18 @@ class Parser:
                 else:
                     self.parsed_content = self.parsed_content[:pmindex + 2]
             write_file(os.path.join(self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
+
+    def stem_parse_document(self):
+        with open(self.stem_file) as f:
+            content = f.read().split('#')
+            for each in content:
+                self.data_parser.initialize()
+                self.data_parser.feed(each)
+                self.docs.append(parse_stuff(each))
+            for doc in self.docs:
+                if doc is not "":
+                    write_file(os.path.join(self.stem_dir, 'CACM-' + str(doc).split(" ")[0].zfill(4) + ".txt"),
+                               str(doc[2:]))
 
 
 # Implementation
