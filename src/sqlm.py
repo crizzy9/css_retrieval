@@ -16,6 +16,7 @@ class SQLM:
         self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
         self.dlens = {doc.replace('CACM-', '').replace('.txt', ''): len(read_file(os.path.join(self.parsed_dir, doc)).split()) for doc in os.listdir(self.parsed_dir)}
         self.clen = sum(self.dlens.values())
+        self.common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
 
     def scores(self, query):
         scores = {}
