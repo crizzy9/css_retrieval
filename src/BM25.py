@@ -18,6 +18,8 @@ class BM25:
         self.calc_k()
         self.R = get_relevance_data()
 
+    # calculates BM25 scores for the given query
+    # returns { doc_id : score }
     def scores(self, qid, query):
         if self.R.get(qid):
             curr_R = len(self.R[qid])

@@ -10,6 +10,7 @@ class QueryParser:
         self.stem_query_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'stem_query_file'))
         self.data_parser = DataParser()
 
+    # get queries from file
     def get_queries(self):
         queries = {}
         self.data_parser.initialize()
@@ -21,6 +22,7 @@ class QueryParser:
             i += 8
         return queries
 
+    # get stemmed queries from file
     def get_stem_queries(self):
         squeries = {}
         with open(self.stem_query_file) as f:

@@ -13,6 +13,7 @@ class Indexer:
         self.index_dir = paths['index_dir']
         self.index_file = paths['index_file']
 
+    # create index
     def create(self):
         docs = os.listdir(self.doc_dir)
         index = {}
@@ -38,11 +39,13 @@ class Indexer:
 
         self.index = index
 
+    # save index to file
     def save_index(self):
         create_dir(self.index_dir)
         dict_to_file(self.index, self.index_file)
         print('Index saved to ' + self.index_file)
 
+    # return index
     def get_index(self):
         return self.index
 

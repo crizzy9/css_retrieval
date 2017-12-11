@@ -42,6 +42,11 @@ File structure:
 - results
     - eval (contains evaluation for all models)
         - bm25
+            - bm25_map_mrr (format: map mrr)
+            - bm25_p_at_5 (format: query_id precision_at_5)
+            - bm25_p_at_20 (format: query_id precision_at_20)
+            - bm25_precision (format: query_id rank doc_id precision_so_far relevant/non-relevant)
+            - bm25_recall (format: query_id rank doc_id recall_so_far relevant/non-relevant)
         - bm25_stop
         - lucene
         - sqlm (Smoothed query likelihood model)
@@ -49,7 +54,7 @@ File structure:
         - sqlm_stop
         - tfidf
         - tfidf_stop
-    - ranking (contains top 100 matches for all queries using all models)
+    - ranking (contains top 100 matches for all queries using all models in TREC format)
     - snippets (contains snippets generated for all queries and their top 100 matches)
         - qid
             - doc-id
@@ -69,7 +74,7 @@ File structure:
     - bm25.py
     - sqlm.py
     - tfidf.py
-    - snippet_generator.py
+    - snippet_generator.py (results are stored in .html documents)
 - .gitignore
 - README.md
 

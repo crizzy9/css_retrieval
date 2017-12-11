@@ -19,6 +19,7 @@ class Parser:
         create_dir(self.stem_dir)
         self.docs = []
 
+    # generates clean corpus from raw documents
     def parse_documents(self):
         for doc in self.raw_corpus:
             with open(os.path.join(self.raw_docs, doc), 'r') as f:
@@ -42,6 +43,7 @@ class Parser:
                     self.parsed_content = self.parsed_content[:pmindex + 2]
             write_file(os.path.join(self.parsed_dir, doc.replace('.html', '.txt')), self.parsed_content)
 
+    # generates clean corpus from stemmed documents
     def stem_parse_documents(self):
         with open(self.stem_file) as f:
             content = f.read().split('#')

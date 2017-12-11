@@ -7,6 +7,7 @@ from src.result_writer import ResultWriter
 
 class TFIDF:
 
+    # (mode = 0 -> no stopping, no stemming, mode = 1 -> stopping, no stemming, mode = 2 -> no stopping, stemming)
     def __init__(self, mode):
         paths = get_model_paths(mode)
         self.mode = mode
@@ -14,6 +15,7 @@ class TFIDF:
         self.index = file_to_dict(paths['index_file'])
         self.stoplist = get_stoplist()
 
+    # calculate scores for given query
     def scores(self, query):
         scores = {}
         docs = os.listdir(self.doc_dir)

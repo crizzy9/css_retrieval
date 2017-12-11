@@ -9,6 +9,8 @@ class ResultWriter:
         self.results_dir = abspath(config.get('DIRS', 'results'), config.get('DIRS', 'ranking'))
         create_dir(self.results_dir)
 
+    # write result to file in the following format
+    # query_id Q0 doc_id rank score model
     def results_to_file(self, file_name, scores, model):
         file_path = os.path.join(self.results_dir, file_name)
         query_id = 0
@@ -28,10 +30,3 @@ class ResultWriter:
                     f.write(model)
                     f.write('\n')
                 f.write('\n')
-
-    def clear_results(self):
-        files = os.listdir(self.results_dir)
-        for f in files:
-            if f.endswith('.txt'):
-                os.remove(abspath(self.results_dir, f))
-

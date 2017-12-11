@@ -27,30 +27,35 @@ def dict_to_file(graph, file_name):
         pickle.dump(graph, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
+# load config parser
 def load_config():
     config = configparser.ConfigParser()
     config.read(CONFIG_FILE)
     return config
 
 
+# create dir if it does not exist
 def create_dir(directory):
     if not os.path.exists(directory):
         print("Creating directory:", directory)
         os.makedirs(directory)
 
 
+# write data to file
 def write_file(path, data):
     f = open(path, 'w')
     f.write(data)
     f.close()
 
 
+# read data from file
 def read_file(file_name):
     with open(file_name, "r") as f:
         text = f.read()
     return text
 
 
+# creates absolute path
 def abspath(path, *paths):
     fpath = os.path.join(os.getcwd(), os.pardir, path)
     for p in paths:
@@ -58,6 +63,7 @@ def abspath(path, *paths):
     return fpath
 
 
+# parse the given data by applying an re
 def parse_stuff(data, period=False):
     # https://regex101.com/r/mTSaQw/3
     if period:
@@ -70,12 +76,14 @@ def parse_stuff(data, period=False):
     return re.sub(whitespace_regex, ' ', re.sub(punc_regex, ' ', data)).strip().lower()
 
 
+# get stop words from file
 def get_stoplist():
     config = load_config()
     common_words = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'common_words'))
     return read_file(common_words).split('\n')
 
 
+# get relevance data from file
 def get_relevance_data():
     config = load_config()
     rel_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'relevance_data'))
@@ -89,6 +97,7 @@ def get_relevance_data():
     return relevance
 
 
+# get document lengths from corpus
 def get_doc_lengths():
     config = load_config()
     parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
@@ -101,12 +110,14 @@ def get_doc_lengths():
     return doc_lens
 
 
+# get number of documents in corpus
 def doc_total():
     config = load_config()
     parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
     return len(os.listdir(parsed_dir))
 
 
+# get paths (corpus, index) based on mode (stopping/stemming)
 def get_model_paths(mode):
     config = load_config()
     paths = {}

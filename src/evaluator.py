@@ -20,6 +20,7 @@ class Evaluator:
         self.rr = {}
         self.mrr = 0.0
 
+    # calculate precision, recall, p_at_5, p_at_20, map, mrr
     def evaluate(self):
         self.precision = self.__calc_precision()
         self.p_at_5 = self.__get_p_at_k(5)
@@ -30,6 +31,8 @@ class Evaluator:
         self.rr = self.__calc_rr()
         self.mrr = self.__calc_mrr()
 
+    # calculate precision
+    # returns { query_id : [precision, ...] }
     def __calc_precision(self):
         precision = {}
         for query_id in self.run:
@@ -43,6 +46,8 @@ class Evaluator:
                     precision[query_id].append([doc_id, p_at_k, relevant])
         return precision
 
+    # calculate recall
+    # returns { query_id : [recall, ...] }
     def __calc_recall(self):
         recall = {}
         for query_id in self.run:
@@ -56,12 +61,16 @@ class Evaluator:
                     recall[query_id].append([doc_id, r_at_k, relevant])
         return recall
 
+    # calculate precision@k
+    # returns { query_id : precision@k }
     def __get_p_at_k(self, k):
         p_at_k = {}
         for query_id in self.precision:
             p_at_k[query_id] = self.precision[query_id][k-1][1]
         return p_at_k
 
+    # calculate average precision
+    # returns { query_id : ap }
     def __calc_ap(self):
         ap = {}
         for query_id in self.precision:
@@ -82,9 +91,12 @@ class Evaluator:
             ap[query_id] = ap_for_query
         return ap
 
+    # calculate mean average precision
     def __calc_map(self):
         return sum(self.ap.values()) / len(self.ap)
 
+    # calculate reciprocal rank
+    # returns { query_id : rr }
     def __calc_rr(self):
         rr = {}
         for query_id in self.rel_data:
@@ -97,9 +109,11 @@ class Evaluator:
                 rr[query_id] = reciprocal_rank
         return rr
 
+    # calculate mean reciprocal rank
     def __calc_mrr(self):
         return sum(self.rr.values()) / len(self.rr)
 
+    # returns total relevant documents retrieved
     def __rel_count(self, query_id, retrieved):
         count = 0
         for doc_id in retrieved:
@@ -107,9 +121,11 @@ class Evaluator:
                 count += 1
         return count
 
+    # return true iff the given document in relevant
     def __is_rel(self, query_id, doc_id):
         return doc_id in self.rel_data[query_id]
 
+    # saves evaluation results to file
     def eval_to_file(self):
         create_dir(self.eval_dir_path)
         precision_file_name = abspath(self.eval_dir_path, self.run_name + '_precision.txt')
@@ -123,6 +139,7 @@ class Evaluator:
         Evaluator.p_at_k_to_file(self.p_at_20, p_at_20_file_name)
         Evaluator.map_mrr_to_file(self.map, self.mrr, map_mrr_file_name)
 
+    # gets the given run from file
     def get_run(self):
         run = {}
         run_text = read_file(self.results_file_path)
@@ -134,6 +151,7 @@ class Evaluator:
             run.setdefault(query_id, []).append(doc_id)
         return run
 
+    # saves precision dict to file
     @staticmethod
     def pr_to_file(metric, file_name):
         with open(file_name, 'w+') as f:
@@ -153,6 +171,7 @@ class Evaluator:
                     f.write('\n')
                 f.write('\n')
 
+    # saves p@k dict to file
     @staticmethod
     def p_at_k_to_file(p_at_k, file_name):
         with open(file_name, 'w+') as f:
@@ -161,6 +180,7 @@ class Evaluator:
                 f.write(str(p_at_k[query_id]) + '\n')
             f.write('\n')
 
+    # saves map and mrr to file
     @staticmethod
     def map_mrr_to_file(map, mrr, file_name):
         with open(file_name, 'w+') as f:

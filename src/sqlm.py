@@ -7,6 +7,7 @@ class SQLM:
 
     LAMBDA = 0.35
 
+    # (mode = 0 -> no stopping, no stemming, mode = 1 -> stopping, no stemming, mode = 2 -> no stopping, stemming)
     def __init__(self, mode):
         paths = get_model_paths(mode)
         self.mode = mode
@@ -16,6 +17,7 @@ class SQLM:
         self.clen = sum(self.dlens.values())
         self.stoplist = get_stoplist()
 
+    # calculate scores for the given query
     def scores(self, query):
         scores = {}
 
