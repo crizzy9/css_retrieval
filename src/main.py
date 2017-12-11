@@ -9,6 +9,7 @@ from src.doc_parser import Parser
 from src.result_writer import ResultWriter
 from src.evaluator import Evaluator
 from src.BM25 import BM25
+from src.snippet_generator import SnippetGenerator
 
 start_time = time.time()
 
@@ -92,6 +93,11 @@ for query_id in queries:
     results_sqlm_prf.append(score_sqlm_prf)
     results_bm25.append(score_bm25)
     results_bm25_stop.append(score_bm25_stop)
+
+    # generating snippets
+    snippet_generator = SnippetGenerator(query, score_sqlm)
+    snippet_generator.get_snippet()
+    snippet_generator.save_snippets(query_id)
 
 print('...Done')
 print()
