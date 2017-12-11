@@ -1,3 +1,4 @@
+import time
 from src.indexer import Indexer
 from src.query_parser import QueryParser
 from src.tfidf import TFIDF
@@ -7,7 +8,6 @@ from src.prf import PRF
 from src.doc_parser import Parser
 from src.result_writer import ResultWriter
 from src.evaluator import Evaluator
-import time
 from src.BM25 import BM25
 
 start_time = time.time()
