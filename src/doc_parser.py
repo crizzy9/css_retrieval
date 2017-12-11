@@ -26,7 +26,15 @@ class Parser:
                 content = f.read()
                 self.data_parser.initialize()
                 self.data_parser.feed(content)
-                self.parsed_content = parse_stuff(self.data_parser.get_data()[3])
+                dataparser_op = self.data_parser.get_data()
+                end = len(dataparser_op)
+                for i in range(end):
+                    if dataparser_op[i] == 'pre':
+                        end = i
+                if end > 3:
+                    self.parsed_content = parse_stuff(" ".join(dataparser_op[3:end]))
+                else:
+                    self.parsed_content = parse_stuff(dataparser_op[3])
                 # to remove numbers at the end (specific for cacm corpus
                 pmindex = self.parsed_content.rfind('pm')
                 if pmindex == -1:
