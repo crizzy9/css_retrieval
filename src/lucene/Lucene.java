@@ -1,4 +1,4 @@
-package lucene_hw4;
+
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,7 +11,6 @@ import java.util.*;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -33,8 +32,7 @@ import org.apache.lucene.util.Version;
  * To create Apache Lucene index in a folder and add files into this index based
  * on the input of the user.
  */
-public class HW4 {
-	private static Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_47);
+public class Lucene {
 	private static Analyzer sAnalyzer = new SimpleAnalyzer(Version.LUCENE_47);
 
 	private IndexWriter writer;
@@ -49,10 +47,10 @@ public class HW4 {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String s = br.readLine();
 
-		HW4 indexer = null;
+		Lucene indexer = null;
 		try {
 			indexLocation = s;
-			indexer = new HW4(s);
+			indexer = new Lucene(s);
 		} catch (Exception ex) {
 			System.out.println("Cannot create index..." + ex.getMessage());
 			System.exit(-1);
@@ -93,6 +91,8 @@ public class HW4 {
 		System.out.println("Enter the FULL path to the query file with .txt extension (Where to read queries from) :");
 		String queryFilePath = br.readLine();
 		HashMap<Integer, String> queries =  readQueriesFromFile(queryFilePath);
+		System.out.println("...........................");
+		System.out.println(queries.size());
 		
 		String systemName = " Lucene_Simple_Analyzer\n";
 		
@@ -107,7 +107,8 @@ public class HW4 {
 			TopScoreDocCollector collector = TopScoreDocCollector.create(maxLimit, true);
 			
 			try {
-				Query q = new QueryParser(Version.LUCENE_47, "contents", sAnalyzer).parse(query);
+				String escapedQuery = query.replace("--", "");
+				Query q = new QueryParser(Version.LUCENE_47, "contents", sAnalyzer).parse(escapedQuery);
 				searcher.search(q, collector);
 				ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
@@ -177,7 +178,7 @@ public class HW4 {
 	 * @throws java.io.IOException
 	 *             when exception creating index.
 	 */
-	HW4(String indexDir) throws IOException {
+	Lucene(String indexDir) throws IOException {
 
 		FSDirectory dir = FSDirectory.open(new File(indexDir));
 

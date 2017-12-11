@@ -1,5 +1,5 @@
 from math import log
-from src.helpers import load_config, abspath, file_to_dict, get_stoplist, get_relevance_data, get_doc_lengths, doc_total
+from src.helpers import load_config, abspath, file_to_dict, get_stoplist, get_relevance_data, get_doc_lengths, doc_total, get_model_paths
 from collections import Counter
 
 
@@ -9,11 +9,9 @@ class BM25:
     b = 0.75
 
     def __init__(self, mode):
+        paths = get_model_paths(mode)
         self.mode = mode
-        config = load_config()
-        self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
-        self.rel_file = abspath(config.get('DIRS', 'data_dir'), config.get('FILES', 'relevance_data'))
-
+        self.index = file_to_dict(paths['index_file'])
         self.stoplist = get_stoplist()
         self.N = doc_total()
         self.k = {}
@@ -31,7 +29,7 @@ class BM25:
         terms = query.strip().split()
         qtfs = dict(Counter(terms))
         for term in terms:
-            if self.mode == 2 and term in self.stoplist:
+            if self.mode == 1 and term in self.stoplist:
                 continue
 
             if self.index.get(term):

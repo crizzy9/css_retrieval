@@ -1,6 +1,6 @@
 from math import log
 import os
-from src.helpers import load_config, abspath, file_to_dict, read_file, get_stoplist
+from src.helpers import load_config, abspath, file_to_dict, read_file, get_stoplist, get_model_paths
 
 
 class SQLM:
@@ -8,11 +8,11 @@ class SQLM:
     LAMBDA = 0.35
 
     def __init__(self, mode):
+        paths = get_model_paths(mode)
         self.mode = mode
-        config = load_config()
-        self.parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
-        self.index = file_to_dict(abspath(config.get('DIRS', 'index_dir'), config.get('FILES', 'index_file')))
-        self.dlens = {doc.replace('CACM-', '').replace('.txt', ''): len(read_file(os.path.join(self.parsed_dir, doc)).split()) for doc in os.listdir(self.parsed_dir)}
+        self.doc_dir = paths['doc_dir']
+        self.index = file_to_dict(paths['index_file'])
+        self.dlens = {doc.replace('CACM-', '').replace('.txt', ''): len(read_file(os.path.join(self.doc_dir, doc)).split()) for doc in os.listdir(self.doc_dir)}
         self.clen = sum(self.dlens.values())
         self.stoplist = get_stoplist()
 
@@ -22,7 +22,7 @@ class SQLM:
         for term in query.split():
 
             if term in self.index.keys():
-                if self.mode == 2:
+                if self.mode == 1:
                     if term in self.stoplist:
                         continue
 

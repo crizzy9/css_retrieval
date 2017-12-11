@@ -105,3 +105,20 @@ def doc_total():
     config = load_config()
     parsed_dir = abspath(config.get('DIRS', 'corpus_dir'), config.get('DIRS', 'parsed_dir'))
     return len(os.listdir(parsed_dir))
+
+
+def get_model_paths(mode):
+    config = load_config()
+    paths = {}
+    index_dir = abspath(config.get('DIRS', 'index_dir'))
+    corpus_dir = abspath(config.get('DIRS', 'corpus_dir'))
+    if mode == 2:
+        index_file = abspath(index_dir, config.get('FILES', 'stem_index_file'))
+        doc_dir = abspath(corpus_dir, config.get('DIRS', 'stem_dir'))
+    else:
+        index_file = abspath(index_dir, config.get('FILES', 'index_file'))
+        doc_dir = abspath(corpus_dir, config.get('DIRS', 'parsed_dir'))
+    paths['index_dir'] = index_dir
+    paths['index_file'] = index_file
+    paths['doc_dir'] = doc_dir
+    return paths
