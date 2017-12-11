@@ -58,6 +58,7 @@ results_file_sqlm_prf = config.get('FILES', 'results_sqlm_prf')
 results_file_bm25 = config.get('FILES', 'results_bm25')
 results_file_bm25_stop = config.get('FILES', 'results_bm25_stop')
 results_file_bm25_stem = config.get('FILES', 'results_bm25_stem')
+results_file_lucene = config.get('FILES', 'results_lucene')
 
 results_tfidf = []
 results_tfidf_stop = []
@@ -128,6 +129,7 @@ eval_sqlm_stop = Evaluator(results_file_sqlm_stop, 'sqlm_stop')
 eval_sqlm_prf = Evaluator(results_file_sqlm_prf, 'sqlm_prf')
 eval_bm25 = Evaluator(results_file_bm25, 'bm25')
 eval_bm25_stop = Evaluator(results_file_bm25_stop, 'bm25_stop')
+eval_lucene = Evaluator(results_file_lucene, 'lucene')
 
 print('Evaluating results for tf.idf...', end='')
 eval_tfidf.evaluate()
@@ -162,6 +164,11 @@ print('Done')
 print('Evaluating results for BM25 with stopping...', end='')
 eval_bm25_stop.evaluate()
 eval_bm25_stop.eval_to_file()
+print('Done')
+
+print('Evaluating results for Lucene...', end='')
+eval_lucene.evaluate()
+eval_lucene.eval_to_file()
 print('Done')
 
 end_time = time.time()
