@@ -20,7 +20,6 @@ class Indexer:
         for doc in docs:
             file_name = os.path.join(self.doc_dir, doc)
             if file_name.endswith('.txt'):
-                print('Indexing ' + file_name + '...', end='')
                 doc_name = doc.replace('CACM-', '').replace('.txt', '')
                 doc_text = read_file(file_name).strip().split()
                 terms = set(doc_text)
@@ -36,7 +35,6 @@ class Indexer:
                         inv_list = sorted(inv_list, key=itemgetter(1))
                     inv_list.append(entry)
                     index[term] = inv_list
-                print('Done')
 
         self.index = index
 
