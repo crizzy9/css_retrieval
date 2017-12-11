@@ -73,7 +73,7 @@ results_bm25_stem = []
 print()
 
 for query_id in queries:
-    print('Scoring documents for query:' + str(query_id) + '...', end='')
+    print('Scoring documents for query:' + str(query_id) + '...')
 
     query = queries[query_id]
     score_tfidf = tfidf.scores(query)
@@ -92,12 +92,11 @@ for query_id in queries:
     results_bm25.append(score_bm25)
     results_bm25_stop.append(score_bm25_stop)
 
-    print('Done')
-
+print('...Done')
 print()
 
 for query_id in queries_stem:
-    print('Scoring documents for stemmed query:' + str(query_id) + '...', end='')
+    print('Scoring documents for stemmed query:' + str(query_id))
 
     query = queries_stem[query_id]
     score_tfidf_stem = tfidf_stem.scores(query)
@@ -108,8 +107,7 @@ for query_id in queries_stem:
     results_sqlm_stem.append(score_sqlm_stem)
     results_bm25_stem.append(score_bm25_stem)
 
-    print('Done')
-
+print('...Done')
 print()
 
 rw.results_to_file(results_file_tfidf, results_tfidf, 'tfidf')
@@ -123,47 +121,47 @@ rw.results_to_file(results_file_bm25, results_bm25, 'bm25')
 rw.results_to_file(results_file_bm25_stop, results_bm25_stop, 'bm25_stop')
 rw.results_to_file(results_file_bm25_stem, results_bm25_stem, 'bm25_stem')
 
-eval_tfidf = Evaluator(results_file_tfidf)
-eval_tfidf_stop = Evaluator(results_file_tfidf_stop)
-eval_sqlm = Evaluator(results_file_sqlm)
-eval_sqlm_stop = Evaluator(results_file_sqlm_stop)
-eval_sqlm_prf = Evaluator(results_file_sqlm_prf)
-eval_bm25 = Evaluator(results_file_bm25)
-eval_bm25_stop = Evaluator(results_file_bm25_stop)
+eval_tfidf = Evaluator(results_file_tfidf, 'tfidf')
+eval_tfidf_stop = Evaluator(results_file_tfidf_stop, 'tfidf_stop')
+eval_sqlm = Evaluator(results_file_sqlm, 'sqlm')
+eval_sqlm_stop = Evaluator(results_file_sqlm_stop, 'sqlm_stop')
+eval_sqlm_prf = Evaluator(results_file_sqlm_prf, 'sqlm_prf')
+eval_bm25 = Evaluator(results_file_bm25, 'bm25')
+eval_bm25_stop = Evaluator(results_file_bm25_stop, 'bm25_stop')
 
 print('Evaluating results for tf.idf...', end='')
 eval_tfidf.evaluate()
-eval_tfidf.eval_to_file('tfidf')
+eval_tfidf.eval_to_file()
 print('Done')
 
 print('Evaluating results for tf.idf with stopping...', end='')
 eval_tfidf_stop.evaluate()
-eval_tfidf_stop.eval_to_file('tfidf_stop')
+eval_tfidf_stop.eval_to_file()
 print('Done')
 
 print('Evaluating results for Smoothed Query Likelihood...', end='')
 eval_sqlm.evaluate()
-eval_sqlm.eval_to_file('sqlm')
+eval_sqlm.eval_to_file()
 print('Done')
 
 print('Evaluating results for Smoothed Query Likelihood with stopping...', end='')
 eval_sqlm_stop.evaluate()
-eval_sqlm_stop.eval_to_file('sqlm_stop')
+eval_sqlm_stop.eval_to_file()
 print('Done')
 
 print('Evaluating results for Smoothed Query Likelihood with Pseudo Relevance Feedback...', end='')
 eval_sqlm_prf.evaluate()
-eval_sqlm_prf.eval_to_file('sqlm_prf')
+eval_sqlm_prf.eval_to_file()
 print('Done')
 
 print('Evaluating results for BM25...', end='')
 eval_bm25.evaluate()
-eval_bm25.eval_to_file('bm25')
+eval_bm25.eval_to_file()
 print('Done')
 
 print('Evaluating results for BM25 with stopping...', end='')
 eval_bm25_stop.evaluate()
-eval_bm25_stop.eval_to_file('bm25_stop')
+eval_bm25_stop.eval_to_file()
 print('Done')
 
 end_time = time.time()

@@ -6,13 +6,11 @@ class ResultWriter:
 
     def __init__(self):
         config = load_config()
-        self.results_dir = abspath(config.get('DIRS', 'results'))
+        self.results_dir = abspath(config.get('DIRS', 'results'), config.get('DIRS', 'ranking'))
         create_dir(self.results_dir)
-        # self.clear_results()
 
     def results_to_file(self, file_name, scores, model):
         file_path = os.path.join(self.results_dir, file_name)
-        # append_write = 'a' if os.path.isfile(file_path) else 'w'
         query_id = 0
         with open(file_path, 'w+') as f:
             for query_score in scores:

@@ -1,12 +1,13 @@
-from src.helpers import load_config, abspath, read_file, get_relevance_data
+from src.helpers import load_config, abspath, read_file, get_relevance_data, create_dir
 
 
 class Evaluator:
 
-    def __init__(self, file_name):
+    def __init__(self, file_name, run_name):
         config = load_config()
-        self.results_file_path = abspath(config.get('DIRS', 'results'), file_name)
-        self.eval_dir_path = abspath(config.get('DIRS', 'results'), config.get('DIRS', 'eval_dir'))
+        self.run_name = run_name
+        self.results_file_path = abspath(config.get('DIRS', 'results'), config.get('DIRS', 'ranking'), file_name)
+        self.eval_dir_path = abspath(config.get('DIRS', 'results'), config.get('DIRS', 'eval_dir'), run_name)
         self.file_name = file_name
         self.rel_data = get_relevance_data()
         self.run = self.get_run()
@@ -109,12 +110,13 @@ class Evaluator:
     def __is_rel(self, query_id, doc_id):
         return doc_id in self.rel_data[query_id]
 
-    def eval_to_file(self, run_name):
-        precision_file_name = abspath(self.eval_dir_path, run_name + '_precision.txt')
-        recall_file_name = abspath(self.eval_dir_path, run_name + '_recall.txt')
-        p_at_5_file_name = abspath(self.eval_dir_path, run_name + '_p_at_5.txt')
-        p_at_20_file_name = abspath(self.eval_dir_path, run_name + '_p_at_20.txt')
-        map_mrr_file_name = abspath(self.eval_dir_path, run_name + '_map_mrr.txt')
+    def eval_to_file(self):
+        create_dir(self.eval_dir_path)
+        precision_file_name = abspath(self.eval_dir_path, self.run_name + '_precision.txt')
+        recall_file_name = abspath(self.eval_dir_path, self.run_name + '_recall.txt')
+        p_at_5_file_name = abspath(self.eval_dir_path, self.run_name + '_p_at_5.txt')
+        p_at_20_file_name = abspath(self.eval_dir_path, self.run_name + '_p_at_20.txt')
+        map_mrr_file_name = abspath(self.eval_dir_path, self.run_name + '_map_mrr.txt')
         Evaluator.pr_to_file(self.precision, precision_file_name)
         Evaluator.pr_to_file(self.recall, recall_file_name)
         Evaluator.p_at_k_to_file(self.p_at_5, p_at_5_file_name)
