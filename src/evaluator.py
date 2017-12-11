@@ -87,12 +87,13 @@ class Evaluator:
     def __calc_rr(self):
         rr = {}
         for query_id in self.rel_data:
-            doc = next(filter(lambda doc_id: self.__is_rel(query_id, doc_id), self.run[query_id]), None)
-            # if doc is None:
-            #     print(self.file_name + ' RR ' + str(query_id) + ': NO RELEVANT DOCS')
-            #     print()
-            reciprocal_rank = 1 / (self.run[query_id].index(doc) + 1) if doc is not None else 0
-            rr[query_id] = reciprocal_rank
+            if query_id in self.run:
+                doc = next(filter(lambda doc_id: self.__is_rel(query_id, doc_id), self.run[query_id]), None)
+                # if doc is None:
+                #     print(self.file_name + ' RR ' + str(query_id) + ': NO RELEVANT DOCS')
+                #     print()
+                reciprocal_rank = 1 / (self.run[query_id].index(doc) + 1) if doc is not None else 0
+                rr[query_id] = reciprocal_rank
         return rr
 
     def __calc_mrr(self):
