@@ -19,6 +19,8 @@ parser = Parser()
 parser.parse_documents()
 parser.stem_parse_documents()
 
+# mode = 0 -> no stemming
+# mode = 2 -> stemming
 print('Creating index...')
 indexer = Indexer(mode=0)
 indexer.create()
@@ -37,6 +39,9 @@ qp = QueryParser()
 queries = qp.get_queries()
 queries_stem = qp.get_stem_queries()
 
+# mode = 0 -> no stopping, no stemming
+# mode = 1 -> stopping, no stemming
+# mode = 2 -> no stopping, stemming
 tfidf = TFIDF(mode=0)
 tfidf_stop = TFIDF(mode=1)
 tfidf_stem = TFIDF(mode=2)
